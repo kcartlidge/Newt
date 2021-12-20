@@ -5,3 +5,4 @@
 - Initial project created
 - Standard repo files added
 - Parse command arguments
+- Scan Postgres

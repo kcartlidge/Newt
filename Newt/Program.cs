@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Newt.Postgres;
 
 namespace Newt
 {
@@ -41,6 +42,14 @@ namespace Newt
                     Console.WriteLine($"Namespace   = {@namespace}");
                     Console.WriteLine($"Force?      = {useForce}");
                     Console.WriteLine($"Destination = {dataFolder}");
+                    
+                    // Scan the database.
+                    Console.WriteLine();
+                    Console.WriteLine("SCANNING DATABASE");
+                    var connstr = Environment.GetEnvironmentVariable(envVar) ?? string.Empty;
+                    var db = new PostgresScanner(connstr, "public").Scan();
+                    Console.WriteLine($"Database    = {db.DatabaseName}");
+                    Console.WriteLine($"Tables      = {db.Tables.Count}");
                 }
             }
             catch (Exception ex)
