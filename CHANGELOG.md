@@ -6,3 +6,4 @@
 - Standard repo files added
 - Parse command arguments
 - Scan Postgres
+- Clear destination folder

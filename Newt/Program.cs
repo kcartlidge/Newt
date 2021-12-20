@@ -50,6 +50,14 @@ namespace Newt
                     var db = new PostgresScanner(connstr, "public").Scan();
                     Console.WriteLine($"Database    = {db.DatabaseName}");
                     Console.WriteLine($"Tables      = {db.Tables.Count}");
+                    
+                    // Clear out existing stuff at the destination.
+                    if (useForce)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine("CLEARING EXISTING");
+                        FileOps.ClearFolder(dataFolder);
+                    }
                 }
             }
             catch (Exception ex)
