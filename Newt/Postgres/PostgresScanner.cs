@@ -1,4 +1,3 @@
-using System;
 using Newt.Models;
 using Npgsql;
 using System.Linq;
@@ -10,57 +9,48 @@ namespace Newt.Postgres
 {
     internal class PostgresScanner
     {
-        private readonly string connectionString;
-        private readonly string schema;
+        private readonly string _connectionString;
+        private readonly string _schema;
 
         public PostgresScanner(string connectionString, string schema)
         {
-            this.connectionString = connectionString;
-            this.schema = schema;
+            this._connectionString = connectionString;
+            this._schema = schema;
         }
 
         internal DBSchema Scan()
         {
-            using (var conn = new NpgsqlConnection(connectionString))
+            using var conn = new NpgsqlConnection(_connectionString);
+            var db = new DBSchema { DatabaseName = conn.Database, Schema = _schema };
+            ScanTables(conn, db);
+            foreach (var table in db.Tables)
             {
-                var DB = new DBSchema { DatabaseName = conn.Database, Schema = schema };
-                ScanTables(conn, DB);
-                foreach (var table in DB.Tables)
+                ScanColumns(conn, table);
+                ScanConstraints(conn, table);
+                ScanIndexes(conn, table);
+
+                for (var i = 0; i < table.Columns.Count - 1; i++)
                 {
-                    ScanColumns(conn, table);
-                    ScanPrimaryKeys(conn, table);
-
-                    if (table.Keys.Count > 1)
-                    {
-                        // Multiple fields *are* actually supported structurally and in most code,
-                        // but will cause issues in some areas such as Controller route parameters.
-                        throw new Exception($"Only single-field primary keys are supported ({table.Name}).");
-                    }
-
-                    ScanIndexes(conn, table);
-
-                    for (int i = 0; i < table.Columns.Count - 1; i++)
-                    {
-                        table.Columns[i].IsKey = table.Keys.Any(x => x.Column == table.Columns[i].Name);
-                    }
+                    table.Columns[i].IsPrimaryKey = table.Constraints
+                        .Any(x => x.Column == table.Columns[i].Name && x.IsPrimaryKey);
                 }
-                return DB;
             }
+            return db;
         }
 
-        private static void ScanTables(NpgsqlConnection conn, DBSchema DB)
+        private static void ScanTables(NpgsqlConnection conn, DBSchema db)
         {
             conn.Open();
             var sql =
                 $"SELECT table_name " +
                 $"FROM   information_schema.tables " +
-                $"WHERE  table_schema = '{DB.Schema}'" +
+                $"WHERE  table_schema = '{db.Schema}'" +
                 $"ORDER BY table_name;";
             using (var cmd = new NpgsqlCommand(sql, conn))
             {
                 var rdr = cmd.ExecuteReader();
                 while (rdr.Read())
-                    DB.Tables.Add(new DBTable(conn.UserName, DB.Schema, rdr.GetString(0)));
+                    db.Tables.Add(new DBTable(conn.UserName, db.Schema, rdr.GetString(0)));
             }
             conn.Close();
         }
@@ -90,29 +80,38 @@ namespace Newt.Postgres
             }
             conn.Close();
         }
-        private static void ScanPrimaryKeys(NpgsqlConnection conn, DBTable table)
+        private static void ScanConstraints(NpgsqlConnection conn, DBTable table)
         {
             conn.Open();
             var sql =
-                $"SELECT tc.constraint_name, kc.column_name " +
-                $"FROM   information_schema.table_constraints tc, information_schema.key_column_usage kc " +
+                $"SELECT tc.constraint_name, kc.column_name, tc.constraint_type, " +
+                $"       cc.table_name as ref_table, cc.column_name as ref_column " +
+                $"FROM   information_schema.table_constraints tc, information_schema.key_column_usage kc, " +
+                $"       information_schema.constraint_column_usage cc " +
                 $"WHERE  kc.table_name = tc.table_name " +
                 $"AND    kc.table_schema = tc.table_schema " +
                 $"AND    kc.constraint_name = tc.constraint_name " +
+                $"AND    cc.constraint_name = tc.constraint_name " +
                 $"AND    kc.table_schema = '{table.Schema}' " +
-                $"AND    kc.table_name = '{table.Name}'" +
-                $"AND    tc.constraint_type = 'PRIMARY KEY'";
+                $"AND    kc.table_name = '{table.Name}'";
             using (var cmd = new NpgsqlCommand(sql, conn))
             {
                 var rdr = cmd.ExecuteReader();
                 while (rdr.Read())
                 {
-                    table.Keys.Add(new DBKey(
+                    var k = new DBConstraint(
                         rdr.GetString(0),
                         table.Schema,
                         table.Name,
-                        rdr.GetString(1)
-                    ));
+                        rdr.GetString(1),
+                        rdr.GetString(2)
+                    );
+                    if (k.IsForeignKey)
+                    {
+                        k.ForeignTable = rdr.GetString(3);
+                        k.ForeignColumn = rdr.GetString(4);
+                    }
+                    table.Constraints.Add(k);
                 }
             }
             conn.Close();
@@ -131,11 +130,9 @@ namespace Newt.Postgres
                 while (rdr.Read())
                 {
                     var name = rdr.GetString(0);
-                    if (table.Keys.Any(x => x.Name == name)) continue;
+                    if (table.Constraints.Any(x => x.Name == name)) continue;
                     table.Indexes.Add(new DBIndex(
                         name,
-                        table.Schema,
-                        table.Name,
                         rdr.GetString(1)
                     ));
                 }

@@ -12,13 +12,11 @@ namespace Newt.Models
         public string Name { get; set; }
         public string Datatype { get; set; }
         public int? Capacity { get; set; }
-        public bool IsKey { get; set; }
+        public bool IsPrimaryKey { get; set; }
         public bool IsNullable { get; set; }
 
         public string PropertyName => Name.ToProper();
-        public string PropertyNameCamelCase => $"{PropertyName.ToLower().First()}{PropertyName.Remove(0, 1)}";
         public string PropertyType => Datatype.ToDotNetAndDbType();
-        public string DbType => Datatype.ToDotNetAndDbType();
         public string FullName => $"{Schema}.{Table}.{Name}";
 
         public DBColumn(
@@ -57,18 +55,18 @@ namespace Newt.Models
             }
         }
 
-        public string AsCode(bool lowLevel = true)
+        public string AsCode()
         {
             var src = new StringBuilder();
-            if (lowLevel) src.AppendLine($"        /// <summary>Column `{Name}` of type `{Datatype}`</summary>");
+            src.AppendLine($"        /// <summary>Column `{Name}` of type `{Datatype}`</summary>");
             if (Capacity.HasValue && PropertyType != "bool")
             {
-                if (lowLevel) src.AppendLine($"        /// <remarks>This column has a capacity of {Capacity}.</remarks>");
+                src.AppendLine($"        /// <remarks>This column has a capacity of {Capacity}.</remarks>");
                 src.AppendLine($"        [MaxLength({Capacity})]");
             }
-            if (lowLevel && IsKey) src.AppendLine($"        [Key]");
+            if (IsPrimaryKey) src.AppendLine($"        [Key]");
             if (!IsNullable) src.AppendLine($"        [Required]");
-            if (lowLevel) src.AppendLine($"        [Column(\"{Name}\")]");
+            src.AppendLine($"        [Column(\"{Name}\")]");
             src.AppendLine($"        [DisplayName(\"{Name.ToProper(true)}\")]");
             var nullableProp = (IsNullable ? "?" : "");
             src.AppendLine($"        public {PropertyType}{nullableProp} {PropertyName} {{ get; set; }}");

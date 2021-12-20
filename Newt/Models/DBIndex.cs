@@ -2,19 +2,14 @@
 {
     internal class DBIndex
     {
-        public string Name { get; set; }
-        public string Schema { get; set; }
-        public string Table { get; set; }
         public string Definition { get; set; }
 
-        public string FullName => $"{Schema}.{Name}";
+        private string Name { get; }
 
-        public DBIndex(string name, string schema, string table, string column)
+        public DBIndex(string name, string definition)
         {
             Name = name;
-            Schema = schema;
-            Table = table;
-            Definition = column;
+            Definition = definition;
         }
 
         public override string ToString()

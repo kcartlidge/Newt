@@ -1,18 +1,14 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace Newt.Models
 {
     internal class DBSchema
     {
-        public string Schema { get; internal set; }
-        public string DatabaseName { get; set; }
-        public List<DBTable> Tables { get; set; }
+        public string Schema { get; internal init; }
+        public string DatabaseName { get; init; }
+        public List<DBTable> Tables { get; }
 
-        public string FullName => $"{DatabaseName}.{Schema}";
-        public int TableNameWidth => Tables.Max(x => x.Name.Length);
-        public int TableFullNameWidth => Tables.Max(x => x.FullName.Length);
-        public int TableClassNameWidth => Tables.Max(x => x.ClassName.Length);
+        private string FullName => $"{DatabaseName}.{Schema}";
 
         public DBSchema()
         {

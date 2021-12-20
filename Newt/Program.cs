@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using Newt.ArgsParsing;
 using Newt.Postgres;
+using Newt.Writers;
 
 namespace Newt
 {
@@ -10,47 +12,54 @@ namespace Newt
         {
             Console.WriteLine();
             Console.WriteLine("NEWT");
-            Console.WriteLine();
-            Console.WriteLine("Usage:");
-            Console.WriteLine("  Newt <db-env-var> <folder> <namespace> [-force]");
-            Console.WriteLine();
+            Console.WriteLine("Generate a DotNet (C#/EF Core) data access repository project from a Postgres database.");
+            var parser = new Parser(args)
+                .RequiresParameter<string>("env", "Environment variable containing the connection string", "")
+                .RequiresParameter<string>("schema", "The database schema to generate code for", "public")
+                .RequiresParameter<string>("folder", "Location of the new solution (and nested projects)", "")
+                .RequiresParameter<string>("namespace", "The top level namespace for the generated C# code")
+                .SupportsOption("force", "Overwrite any destination content")
+                .Help();
             Console.WriteLine("Example:");
-            Console.WriteLine("  Newt DB_CONNSTR \"\\Source\\Core\\SampleAPI\" SampleAPI -force");
+            Console.WriteLine("  Newt --force -env DB_CONNSTR -schema public -folder \"\\Source\\Core\\SampleAPI\" -namespace SampleAPI");
             Console.WriteLine();
-            Console.WriteLine("db-env-var = Environment variable containing the connection string");
-            Console.WriteLine("folder     = Location of the new solution (and nested projects)");
-            Console.WriteLine("namespace  = The top level namespace for the generated C# code");
-            Console.WriteLine("-force     = Allows overwriting (if provided it must be last)");
-            Console.WriteLine();
-            
+
             try
             {
-                if (args.Length == 3 || (args.Length == 4 && args[3].TrimStart('-').ToLower() == "force"))
+                parser.Parse();
+                if (parser.HasErrors)
                 {
-                    // Has the expected number of arguments.
-                    var envVar = args[0];
-                    var folder = args[1];
-                    var @namespace = args[2];
-                    var useForce = (args.Length == 4);
+                    foreach (var err in parser.ExpectationErrors) Console.WriteLine(err.Value);
+                    foreach (var err in parser.ArgumentErrors) Console.WriteLine(err.Value);
+                }
+                else
+                {
+                    // Has the expected arguments.
+                    var envVar = parser.GetParameter<string>("env");
+                    var schema = parser.GetParameter<string>("schema");
+                    var folder = Path.GetFullPath(parser.GetParameter<string>("folder"));
+                    var @namespace = parser.GetParameter<string>("namespace");
+                    var useForce = parser.IsOptionProvided("force");
                     var dataFolder = Path.Combine(folder, $"{@namespace}");
 
                     // Show the details.
                     Console.WriteLine();
                     Console.WriteLine("COMMAND ARGUMENTS");
                     Console.WriteLine($"Environment = {envVar}");
+                    Console.WriteLine($"DB Schema   = {schema}");
                     Console.WriteLine($"Folder      = {folder}");
                     Console.WriteLine($"Namespace   = {@namespace}");
                     Console.WriteLine($"Force?      = {useForce}");
                     Console.WriteLine($"Destination = {dataFolder}");
-                    
+
                     // Scan the database.
                     Console.WriteLine();
                     Console.WriteLine("SCANNING DATABASE");
                     var connstr = Environment.GetEnvironmentVariable(envVar) ?? string.Empty;
-                    var db = new PostgresScanner(connstr, "public").Scan();
+                    var db = new PostgresScanner(connstr, schema).Scan();
                     Console.WriteLine($"Database    = {db.DatabaseName}");
                     Console.WriteLine($"Tables      = {db.Tables.Count}");
-                    
+
                     // Clear out existing stuff at the destination.
                     if (useForce)
                     {
@@ -58,7 +67,18 @@ namespace Newt
                         Console.WriteLine("CLEARING EXISTING");
                         FileOps.ClearFolder(dataFolder);
                     }
+
+                    // Create the data solution.
+                    new DataProject(db, useForce, folder, @namespace).Write();
+                    new SqlScripts(db, useForce, dataFolder, @namespace).Write();
+                    new Entities(db, useForce, dataFolder, @namespace).Write();
+                    new Contexts(db, useForce, dataFolder, @namespace, envVar).Write();
+                    new NugetPackages(db, useForce, folder, @namespace).Write();
                 }
+
+                Console.WriteLine();
+                Console.WriteLine("DONE");
+                Console.WriteLine();
             }
             catch (Exception ex)
             {
