@@ -6,6 +6,7 @@ namespace Newt.Models
     internal class DBConstraint
     {
         public string Name { get; set; }
+        public DBTable Table { get; set; }
         public string Column { get; set; }
         public string ForeignTable { get; set; }
         public string ForeignColumn { get; set; }
@@ -15,10 +16,9 @@ namespace Newt.Models
 
         private string ConstraintType { get; set; }
         private string Schema { get; set; }
-        private string Table { get; set; }
         private string FullName => $"{Schema}.{Name}";
 
-        public DBConstraint(string name, string schema, string table, string column, string constraintType)
+        public DBConstraint(string name, string schema, DBTable table, string column, string constraintType)
         {
             Name = name;
             Schema = schema;

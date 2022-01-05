@@ -1,3 +1,4 @@
+using System.Linq;
 using Newt.Models;
 
 namespace Newt.Writers
@@ -15,6 +16,8 @@ namespace Newt.Writers
             {
                 var src = StartFile($"{table.ClassName}.cs");
                 src.AppendLine($"using System;");
+                if (table.NavigationProperties.Any())
+                    src.AppendLine($"using System.Collections.Generic;");
                 src.AppendLine($"using System.ComponentModel;");
                 src.AppendLine($"using System.ComponentModel.DataAnnotations;");
                 src.AppendLine($"using System.ComponentModel.DataAnnotations.Schema;");
@@ -34,6 +37,16 @@ namespace Newt.Writers
 
                     src.Append(column.AsCode());
                 }
+
+                foreach (var navigation in table.NavigationProperties)
+                {
+                    var clsName = navigation.Constraint?.Table.ClassName;
+                    var clsNames =  navigation.Constraint?.Table.ClassNamePlural;
+                    src.AppendLine();
+                    src.AppendLine($"        /// <summary>Foreign key on {clsName}</summary>");
+                    src.AppendLine($"        public List<{clsName}> {clsNames} {{ get; set; }}");
+                }
+                
                 src.AppendLine($"    }}");
                 src.AppendLine($"}}");
                 src.AppendLine($"");

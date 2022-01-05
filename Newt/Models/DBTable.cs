@@ -14,6 +14,7 @@ namespace Newt.Models
         public List<DBColumn> Columns { get; }
         public List<DBConstraint> Constraints { get; }
         public List<DBIndex> Indexes { get; }
+        public List<DBRelationship> NavigationProperties { get; }
 
         public string ClassName => Name.ToProper();
         public string ClassNamePlural => _plurals.Pluralize(ClassName);
@@ -30,6 +31,7 @@ namespace Newt.Models
             Columns = new List<DBColumn>();
             Constraints = new List<DBConstraint>();
             Indexes = new List<DBIndex>();
+            NavigationProperties = new List<DBRelationship>();
         }
         
         public override string ToString()

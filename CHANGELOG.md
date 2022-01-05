@@ -19,3 +19,7 @@
 - Create EF contexts
   - InMemory
   - Postgres
+- Navigation properties
+  - Derived from foreign keys
+  - Currently one way only
+    - Where an A has B's, A gets a List<B>

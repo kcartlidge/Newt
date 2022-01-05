@@ -29,10 +29,22 @@ namespace Newt.Postgres
                 ScanConstraints(conn, table);
                 ScanIndexes(conn, table);
 
+                // Isolate and flag primary key columns.
                 for (var i = 0; i < table.Columns.Count - 1; i++)
                 {
                     table.Columns[i].IsPrimaryKey = table.Constraints
                         .Any(x => x.Column == table.Columns[i].Name && x.IsPrimaryKey);
+                }
+                
+                // Create relationships from foreign keys.
+                foreach (var constraint in table.Constraints.Where(x => x.IsForeignKey))
+                {
+                    var targetTable = db.Tables.FirstOrDefault(x => x.Name == constraint.ForeignTable);
+                    targetTable?.NavigationProperties.Add(new DBRelationship
+                    {
+                        Constraint = constraint,
+                        Table = table,
+                    });
                 }
             }
             return db;
@@ -102,7 +114,7 @@ namespace Newt.Postgres
                     var k = new DBConstraint(
                         rdr.GetString(0),
                         table.Schema,
-                        table.Name,
+                        table,
                         rdr.GetString(1),
                         rdr.GetString(2)
                     );
