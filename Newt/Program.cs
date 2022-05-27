@@ -11,7 +11,7 @@ namespace Newt
         static void Main(string[] args)
         {
             Console.WriteLine();
-            Console.WriteLine("NEWT");
+            Console.WriteLine("NEWT (build 2022-05-27)");
             Console.WriteLine("Generate a DotNet (C#/EF Core) data access repository project from a Postgres database.");
             var parser = new Parser(args)
                 .RequiresParameter<string>("env", "Environment variable containing the connection string", "")
@@ -21,7 +21,7 @@ namespace Newt
                 .SupportsOption("force", "Overwrite any destination content")
                 .Help();
             Console.WriteLine("Example:");
-            Console.WriteLine("  Newt --force -env DB_CONNSTR -schema public -folder \"\\Source\\Core\\SampleAPI\" -namespace SampleAPI");
+            Console.WriteLine("  Newt --force -env DB_CONNSTR -schema public -folder \"/Source/Core/SampleAPI\" -namespace SampleAPI");
             Console.WriteLine();
 
             try

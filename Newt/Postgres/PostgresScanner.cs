@@ -1,12 +1,13 @@
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor.
+#pragma warning disable CS8604 // Possible null reference argument.
+
 using Newt.Models;
 using Npgsql;
 using System.Linq;
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor.
-#pragma warning disable CS8604 // Possible null reference argument.
-
 namespace Newt.Postgres
 {
+    /// <summary>Database structure scanner.</summary>
     internal class PostgresScanner
     {
         private readonly string _connectionString;
@@ -18,13 +19,18 @@ namespace Newt.Postgres
             this._schema = schema;
         }
 
+        /// <summary>
+        /// Scan the database, returning details of the schema contents.
+        /// </summary>
         internal DBSchema Scan()
         {
             using var conn = new NpgsqlConnection(_connectionString);
             var db = new DBSchema { DatabaseName = conn.Database, Schema = _schema };
+
             ScanTables(conn, db);
             foreach (var table in db.Tables)
             {
+                // Get the basics.
                 ScanColumns(conn, table);
                 ScanConstraints(conn, table);
                 ScanIndexes(conn, table);
@@ -50,6 +56,7 @@ namespace Newt.Postgres
             return db;
         }
 
+        /// <summary>Scan all the tables.</summary>
         private static void ScanTables(NpgsqlConnection conn, DBSchema db)
         {
             conn.Open();
@@ -66,6 +73,8 @@ namespace Newt.Postgres
             }
             conn.Close();
         }
+
+        /// <summary>Scan all a table's column details.</summary>
         private static void ScanColumns(NpgsqlConnection conn, DBTable table)
         {
             conn.Open();
@@ -92,6 +101,8 @@ namespace Newt.Postgres
             }
             conn.Close();
         }
+
+        /// <summary>Scan all a table's constraint details.</summary>
         private static void ScanConstraints(NpgsqlConnection conn, DBTable table)
         {
             conn.Open();
@@ -128,6 +139,8 @@ namespace Newt.Postgres
             }
             conn.Close();
         }
+
+        /// <summary>Scan all a table's indexes.</summary>
         private static void ScanIndexes(NpgsqlConnection conn, DBTable table)
         {
             conn.Open();
@@ -153,6 +166,3 @@ namespace Newt.Postgres
         }
     }
 }
-
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor.
-#pragma warning restore CS8604 // Possible null reference argument.

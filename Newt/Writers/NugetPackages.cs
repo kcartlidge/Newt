@@ -3,6 +3,7 @@ using Newt.Models;
 
 namespace Newt.Writers
 {
+    /// <summary>Registers the required Nuget packages.</summary>
     internal class NugetPackages : BaseWriter
     {
         public NugetPackages(DBSchema db, bool force, string folder, string @namespace)
@@ -10,6 +11,9 @@ namespace Newt.Writers
         {
         }
 
+        /// <summary>
+        /// Register the required Nuget packages using the installed 'dotnet' command.
+        /// </summary>
         public void Write()
         {
             Console.WriteLine();

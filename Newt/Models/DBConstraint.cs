@@ -3,6 +3,7 @@ using System.Text;
 
 namespace Newt.Models
 {
+    /// <summary>Defines a database constraint.</summary>
     internal class DBConstraint
     {
         public string Name { get; set; }
@@ -16,6 +17,8 @@ namespace Newt.Models
 
         private string ConstraintType { get; set; }
         private string Schema { get; set; }
+
+        /// <summary>Dot-notated schema and name.</summary>
         private string FullName => $"{Schema}.{Name}";
 
         public DBConstraint(string name, string schema, DBTable table, string column, string constraintType)
@@ -28,6 +31,7 @@ namespace Newt.Models
             ForeignTable = ForeignColumn = String.Empty;
         }
 
+        /// <summary>Generate some SQL source for this constraint.</summary>
         public string GetDefinition(bool withTrailingComma)
         {
             var src = new StringBuilder("  CONSTRAINT ");

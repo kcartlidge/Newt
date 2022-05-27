@@ -1,6 +1,12 @@
 # CHANGE LOG
 
-## Unreleased
+## 2022-05-27
+
+- Tidied up the code
+- Added extra `XmlSummary` comments
+- Updated the README file
+
+## 2022-01-05
 
 - Initial project created
 - Standard repo files added
@@ -9,17 +15,17 @@
 - Clear destination folder
 - Create data project
 - Create SQL script
-  - Columns
-  - Primary keys
-  - Foreign keys
-  - Indexes
+    - Columns
+    - Primary keys
+    - Foreign keys
+    - Indexes
 - Create entities
-  - Data annotations applied
-    - Key, Required, MaxLength, DisplayName
+    - Data annotations applied
+        - Key, Required, MaxLength, DisplayName
 - Create EF contexts
-  - InMemory
-  - Postgres
+    - InMemory
+    - Postgres
 - Navigation properties
-  - Derived from foreign keys
-  - Currently one way only
-    - Where an A has B's, A gets a List<B>
+    - Derived from foreign keys
+    - Currently one way only
+        - Where an A has B's, A gets a List<B>

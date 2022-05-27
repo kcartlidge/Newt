@@ -4,14 +4,16 @@ using Newt.Models;
 
 namespace Newt.Writers
 {
+    /// <summary>Creates the emergency-use SQL scripts for the schema.</summary>
     internal class SqlScripts : BaseWriter
     {
         public SqlScripts(DBSchema db, bool useForce, string folder, string @namespace)
             : base(db, useForce, folder, @namespace) { }
 
+        /// <summary>Write the emergency-use SQL scripts for the schema.</summary>
         public void Write()
         {
-            EnsureFolder("SQL SCRIPT", "SQL");
+            EnsureFullPathExists("SQL SCRIPT", "SQL");
 
             var src = StartFile($"Postgres.sql");
             src.AppendLine($"/*");

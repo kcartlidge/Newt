@@ -3,6 +3,7 @@ using Newt.Models;
 
 namespace Newt.Writers
 {
+    /// <summary>Writes the EF Core context definitions.</summary>
     internal class Contexts : BaseWriter
     {
         private readonly string _envVar;
@@ -13,20 +14,21 @@ namespace Newt.Writers
             _envVar = envVar;
         }
 
+        /// <summary>Write the contexts for both InMemory and Postgres.</summary>
         public void Write()
         {
-            EnsureFolder("EF CORE CONTEXTS");
+            EnsureFullPathExists("EF CORE CONTEXTS");
 
-            foreach (var contextType in new[] {"Data", "InMemoryData"})
+            foreach (var contextType in new[] { "Data", "InMemoryData" })
             {
                 var src = StartFile($"{contextType}Context.cs");
-                src.AppendLine($"using System;");
-                src.AppendLine($"using Microsoft.EntityFrameworkCore;");
-                src.AppendLine($"using {Namespace}.Entities;");
-                src.AppendLine($"");
                 src.AppendLine($"#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor.");
                 if (contextType == "Data")
                     src.AppendLine($"#pragma warning disable CS8604 // Possible null reference argument.");
+                src.AppendLine($"");
+                src.AppendLine($"using System;");
+                src.AppendLine($"using Microsoft.EntityFrameworkCore;");
+                src.AppendLine($"using {Namespace}.Entities;");
                 src.AppendLine($"");
                 src.AppendLine($"namespace {Namespace}");
                 src.AppendLine($"{{");

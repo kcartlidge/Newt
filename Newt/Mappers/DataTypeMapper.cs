@@ -2,8 +2,10 @@ using System;
 
 namespace Newt.Mappers
 {
+    /// <summary>Data type mappers. Obviously.</summary>
     internal static class DataTypeMapper
     {
+        /// <summary>Converts from a Postgres database type to a .Net one.</summary>
         public static string ToDotNetAndDbType(this string databaseType)
         {
             switch (databaseType.Trim().ToLowerInvariant())
@@ -40,7 +42,7 @@ namespace Newt.Mappers
                     return "bool";
 
                 case "bit":
-                    throw new Exception("Unsupported column type 'bit' - use 'voolean' instead.");
+                    throw new Exception("Unsupported column type 'bit' - use 'boolean' instead.");
 
                 case "timestamp":
                 case "timestamptz":

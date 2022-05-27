@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Newt.Models
 {
+    /// <summary>Defines a database column.</summary>
     internal class DBColumn
     {
         public int Sequence { get; set; }
@@ -15,8 +16,13 @@ namespace Newt.Models
         public bool IsPrimaryKey { get; set; }
         public bool IsNullable { get; set; }
 
-        public string PropertyName => Name.ToProper();
+        /// <summary>The ProperCase name of the mapped property.</summary>
+        public string PropertyName => Name.SnakeToProper();
+
+        /// <summary>The mapped property's .Net data type.</summary>
         public string PropertyType => Datatype.ToDotNetAndDbType();
+
+        /// <summary>Dot-notated schema, table, and name.</summary>
         public string FullName => $"{Schema}.{Table}.{Name}";
 
         public DBColumn(
@@ -37,6 +43,7 @@ namespace Newt.Models
             Capacity = capacity;
         }
 
+        /// <summary>Does this property map to a whole number type?</summary>
         public bool IsCardinal
         {
             get
@@ -55,6 +62,7 @@ namespace Newt.Models
             }
         }
 
+        /// <summary>Generate the .Net property source for this column.</summary>
         public string AsCode()
         {
             var src = new StringBuilder();
@@ -67,7 +75,7 @@ namespace Newt.Models
             if (IsPrimaryKey) src.AppendLine($"        [Key]");
             if (!IsNullable) src.AppendLine($"        [Required]");
             src.AppendLine($"        [Column(\"{Name}\")]");
-            src.AppendLine($"        [DisplayName(\"{Name.ToProper(true)}\")]");
+            src.AppendLine($"        [DisplayName(\"{Name.SnakeToProper(true)}\")]");
             var nullableProp = (IsNullable ? "?" : "");
             src.AppendLine($"        public {PropertyType}{nullableProp} {PropertyName} {{ get; set; }}");
             return src.ToString();

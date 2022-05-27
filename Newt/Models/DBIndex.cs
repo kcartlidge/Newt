@@ -1,5 +1,6 @@
 ﻿namespace Newt.Models
 {
+    /// <summary>Defines a database index.</summary>
     internal class DBIndex
     {
         public string Definition { get; set; }
