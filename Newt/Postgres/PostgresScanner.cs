@@ -79,7 +79,8 @@ namespace Newt.Postgres
         {
             conn.Open();
             var sql =
-                $"SELECT ordinal_position, column_name, is_nullable, data_type, character_maximum_length " +
+                $"SELECT ordinal_position, column_name, is_nullable, data_type, character_maximum_length, " +
+                $"       pg_catalog.col_description(format('%s.%s',table_schema,table_name)::regclass::oid,ordinal_position) as column_description " +
                 $"FROM   information_schema.columns " +
                 $"WHERE  table_schema = '{table.Schema}' " +
                 $"AND    table_name = '{table.Name}';";
@@ -89,11 +90,17 @@ namespace Newt.Postgres
                 while (rdr.Read())
                 {
                     int? maxLen = rdr.IsDBNull(4) ? null : rdr.GetInt32(4);
+                    string comment = rdr.IsDBNull(5) ? "" : rdr.GetString(5);
+                    if (comment.HasValue() && comment.EndsWith(".") == false)
+                    {
+                        comment = $"{comment.Trim()}.";
+                    }
                     table.Columns.Add(new DBColumn(
                         rdr.GetInt32(0),
                         table.Schema,
                         table.Name,
                         rdr.GetString(1),
+                        comment,
                         rdr.GetString(2).ToUpperInvariant() == "YES",
                         rdr.GetString(3),
                         maxLen));

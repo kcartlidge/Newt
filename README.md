@@ -26,6 +26,7 @@ Add the connection details for your Postgres database to your environment.
     - Create entity models (classes) for each table
         - With automatic .Net class/property naming conventions
         - With data annotations for keys, types, lengths etc
+        - With comments matching those for the database columns
         - With comments regarding where they map to
     - Create an emergency SQL script for everything generated
         - Tables, columns, primary/foreign keys, indexes etc

@@ -5,6 +5,7 @@
 - Tidied up the code
 - Added extra `XmlSummary` comments
 - Updated the README file
+- Added column comments
 
 ## 2022-01-05
 

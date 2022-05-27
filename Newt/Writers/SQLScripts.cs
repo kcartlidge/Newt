@@ -57,6 +57,15 @@ namespace Newt.Writers
             src.AppendLine($");");
             src.AppendLine($"ALTER TABLE {table.Schema}.{table.Name} OWNER to {table.Owner};");
             foreach (var c in table.Indexes) src.AppendLine($"{c.Definition};");
+
+            foreach (var c in table.Columns)
+            {
+                if (c.Comment.HasValue())
+                {
+                    var comment = c.Comment.Trim().Replace("'", "''");
+                    src.AppendLine($"COMMENT ON COLUMN {c.FullName} IS '{comment}';");
+                }
+            }
         }
     }
 }

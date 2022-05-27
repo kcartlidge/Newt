@@ -11,6 +11,7 @@ namespace Newt.Models
         public string Schema { get; set; }
         public string Table { get; set; }
         public string Name { get; set; }
+        public string Comment { get; set; }
         public string Datatype { get; set; }
         public int? Capacity { get; set; }
         public bool IsPrimaryKey { get; set; }
@@ -25,11 +26,15 @@ namespace Newt.Models
         /// <summary>Dot-notated schema, table, and name.</summary>
         public string FullName => $"{Schema}.{Table}.{Name}";
 
+        /// <summary>True if Capacity holds a usable value.</summary>
+        public bool UseCapacity => Capacity.HasValue && PropertyType != "bool";
+
         public DBColumn(
             int sequence,
             string schema,
             string table,
             string name,
+            string comment,
             bool isNullable,
             string datatype,
             int? capacity)
@@ -38,6 +43,7 @@ namespace Newt.Models
             Schema = schema;
             Table = table;
             Name = name;
+            Comment = comment ?? "";
             IsNullable = isNullable;
             Datatype = datatype;
             Capacity = capacity;
@@ -66,12 +72,12 @@ namespace Newt.Models
         public string AsCode()
         {
             var src = new StringBuilder();
-            src.AppendLine($"        /// <summary>Column `{Name}` of type `{Datatype}`</summary>");
-            if (Capacity.HasValue && PropertyType != "bool")
-            {
-                src.AppendLine($"        /// <remarks>This column has a capacity of {Capacity}.</remarks>");
-                src.AppendLine($"        [MaxLength({Capacity})]");
-            }
+            src.AppendLine($"        /// <summary>");
+            if (Comment.HasValue()) src.AppendLine($"        /// {Comment}");
+            src.AppendLine($"        /// Database column `{Name}` of type `{Datatype}`.");
+            if (UseCapacity) src.AppendLine($"        /// The capacity is {Capacity}.");
+            src.AppendLine($"        /// </summary>");
+            if (UseCapacity) src.AppendLine($"        [MaxLength({Capacity})]");
             if (IsPrimaryKey) src.AppendLine($"        [Key]");
             if (!IsNullable) src.AppendLine($"        [Required]");
             src.AppendLine($"        [Column(\"{Name}\")]");
@@ -84,7 +90,7 @@ namespace Newt.Models
         public override string ToString()
         {
             var nul = IsNullable ? string.Empty : " not null";
-            var cap = Capacity.HasValue ? $"({Capacity})" : string.Empty;
+            var cap = UseCapacity ? $"({Capacity})" : string.Empty;
             return $"{Sequence}. {FullName} ({PropertyName}) - {Datatype}{cap}{nul}";
         }
     }
