@@ -1,5 +1,9 @@
 # CHANGE LOG
 
+## 2022-05-28
+
+- Write JSON schema dump
+
 ## 2022-05-27
 
 - Tidied up the code
