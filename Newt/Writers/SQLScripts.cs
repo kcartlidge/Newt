@@ -17,11 +17,20 @@ namespace Newt.Writers
 
             var src = StartFile($"Postgres.sql");
             src.AppendLine($"/*");
-            src.AppendLine($"   WARNING - DESTRUCTIVE SCRIPT");
-            src.AppendLine($"   This is a fallback script only, NOT a structural database backup.");
-            src.AppendLine($"   The SQL below only represents what was needed to generate C# code");
-            src.AppendLine($"   and is intended solely for emergency use when other backups fail.");
-            src.AppendLine($"   Schemas created from it may not be complete (eg sequences).");
+            src.AppendLine($"  WARNING - DESTRUCTIVE SCRIPT");
+            src.AppendLine($"  This is a fallback script only, NOT a structural database backup.");
+            src.AppendLine($"  The SQL below only represents what was needed to generate C# code");
+            src.AppendLine($"  and is intended solely for emergency use when other backups fail.");
+            src.AppendLine($"  Schemas created from it may not be complete (eg sequences).");
+            src.AppendLine($"");
+            src.AppendLine($"  The script should NOT be simply executed in one go!");
+            src.AppendLine($"  Several steps are teken to ensure you need to take care:");
+            src.AppendLine($"");
+            src.AppendLine($"  * DROP statements assume things already exist");
+            src.AppendLine($"    This is deliberate to stop simple execution");
+            src.AppendLine($"");
+            src.AppendLine($"  * The tables are listed alphabetically");
+            src.AppendLine($"    Do them manually in order of dependencies");
             src.AppendLine($"*/");
             foreach (var table in Schema.Tables)
             {
