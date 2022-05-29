@@ -11,7 +11,7 @@ namespace Newt
         static void Main(string[] args)
         {
             Console.WriteLine();
-            Console.WriteLine("NEWT (build 2022-05-28)");
+            Console.WriteLine("NEWT (build 2022-05-29)");
             Console.WriteLine("Generate a DotNet (C#/EF Core) data access repository project from a Postgres database.");
             var parser = new Parser(args)
                 .RequiresParameter<string>("env", "Environment variable containing the connection string", "")
@@ -69,6 +69,7 @@ namespace Newt
 
                     // Create the data solution.
                     new JSON(db, useForce, folder, @namespace).Write();
+                    new Graphviz(db, useForce, folder, @namespace).Write();
                     new DataProject(db, useForce, folder, @namespace).Write();
                     new SqlScripts(db, useForce, dataFolder, @namespace).Write();
                     new Entities(db, useForce, dataFolder, @namespace).Write();

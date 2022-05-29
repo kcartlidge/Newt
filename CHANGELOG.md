@@ -1,5 +1,9 @@
 # CHANGE LOG
 
+## 2022-05-29
+
+- Write Graphiz `.dot` source
+
 ## 2022-05-28
 
 - Write JSON schema dump

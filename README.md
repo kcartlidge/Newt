@@ -1,6 +1,7 @@
 # NEWT
 
 Autogenerate a .Net (C#/EF Core) data project (class library with entities and data contexts) from a Postgres database.
+Also creates backup SQL and Graphviz `.dot` diagram source.
 
 - [View the changelog](./CHANGELOG.md)
 
@@ -30,6 +31,8 @@ Add the connection details for your Postgres database to your environment.
         - With comments regarding where they map to
     - Create an emergency SQL script for everything generated
         - Tables, columns, primary/foreign keys, indexes etc
+    - Create the `.dot` source for a *Graphviz* class diagram
+        - With classes, properties, and foreign keys
 - You can then ...
     - Include this in your solution (or generate it in-place)
     - Re-run any time you want an updated data project
@@ -51,7 +54,8 @@ Make sure you check the database conventions in the contents (below).
     - [Created context](#created-context)
     - [Created entity](#created-entity)
     - [Created SQL](#created-sql)
-    - [Sample Usage](#sample-usage)
+    - [Created Graphviz](#created-graphviz)
+- [Sample Usage](#sample-usage)
 - [Generating stand-alone builds](#generating-stand-alone-builds)
     - It's easy to generate for a choice of platforms
     - Builds are small enough to be checked into source control
@@ -280,7 +284,57 @@ ALTER TABLE public.blog OWNER to sampleapi;
 COMMENT ON COLUMN public.blog.title IS 'For use in browser tabs, tables, lists etc.';
 ```
 
-### Sample Usage
+### Created Graphviz
+
+[Graphviz](https://graphviz.org) source is generated in a `schema.dot` file.
+At the top of that file are sample commands to render it.
+
+A Graphviz image generated from sample source is below, with the source itself underneath that.
+Each class lists its properties then the other classes it is linked to by foreign keys.
+For brevity most of the classes have been manually removed from the sample source and image.
+
+![Sample Graphviz](./graphviz.jpg)
+
+``` dot
+// GRAPHVIZ DEFINITION
+//
+// Example usage:
+//   dot -o schema.png -Tpng schema.dot
+//   dot -o schema.svg -Tsvg schema.dot
+
+digraph G {
+  label = "SampleAPI.Data"
+  labelloc = "top"
+  fontname = "Verdana"
+  fontsize = 16
+  nodesep = 0.5
+  ranksep = 0.5
+  pad = 0.25
+
+  node[
+    fontname = "Monospace"
+    fontsize = 12
+    shape = "Mrecord"
+    width = 1.5
+    margin = "0.1,0.1"
+  ]
+
+  edge[
+    arrowhead = "dot"
+  ]
+
+  // Classes.
+  Blog [ label = "{Blog | Id ................. long\nCreatedAt ...... DateTime\nDeletedAt ...... DateTime\nAdminEmail .. string[100]\nTitle ........ string[50]\nBlurb ........ string[50]\nHostname .... string[100]\nCopyright ... string[100]\nThemeId ............. int\n | Authors\lCategories\lPosts\lTags\lThemes\l}}" ]
+  Post [ label = "{Post | Id .................. long\nBlogId .............. long\nCreatedAt ....... DateTime\nDeletedAt ....... DateTime\nDisplay ...... string[100]\nSnippet ...... string[500]\nMarkdown .......... string\nPublished ....... DateTime\n | Authors\lComments\lTags\l}}" ]
+  Article [ label = "{Article | Id .................. long\nBlogId .............. long\nCreatedAt ....... DateTime\nDeletedAt ....... DateTime\nTitle ........ string[100]\nMarkdown .......... string\nPublished ....... DateTime\n | Tags\l}}" ]
+
+  // Foreign keys.
+  Blog -> Post
+  Blog -> Article
+}
+```
+
+## Sample Usage
 
 Here's how it might be registered in `Program.cs` in .Net 6.
 It assumes the created project is named `SampleApi.Data` and is referenced.
