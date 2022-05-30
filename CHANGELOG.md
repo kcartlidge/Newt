@@ -1,5 +1,9 @@
 # CHANGE LOG
 
+## 2022-05-31
+
+- Move `.dot` file down a folder
+
 ## 2022-05-29
 
 - Write Graphiz `.dot` source

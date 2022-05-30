@@ -40,6 +40,8 @@ Add the connection details for your Postgres database to your environment.
 ## Status
 
 This is *beta*. It works and is in active use.
+Column defaults are not currently scripted in the backup SQL.
+
 Make sure you check the database conventions in the contents (below).
 
 ---
@@ -293,7 +295,7 @@ A Graphviz image generated from sample source is below, with the source itself u
 Each class lists its properties then the other classes it is linked to by foreign keys.
 For brevity most of the classes have been manually removed from the sample source and image.
 
-![Sample Graphviz](./graphviz.jpg)
+![Sample Graphviz](./schema.svg)
 
 ``` dot
 // GRAPHVIZ DEFINITION
@@ -302,8 +304,8 @@ For brevity most of the classes have been manually removed from the sample sourc
 //   dot -o schema.png -Tpng schema.dot
 //   dot -o schema.svg -Tsvg schema.dot
 
-digraph G {
-  label = "SampleAPI.Data"
+digraph {
+  label = "Class diagram for SampleAPI.Data"
   labelloc = "top"
   fontname = "Verdana"
   fontsize = 16
@@ -385,7 +387,7 @@ This can be done with a single command as shown below.
 There are a selection, each targeting a different output system.
 
 The commands should be run from within the `Newt/Newt` *project* folder, not the solution.
-Remember to update the build date in the `Program.cs` console output.
+Remember to update the build date in the `Program.cs` console output and the CHANGELOG.
 
 ``` shell
 # Mac, Apple Silicon (eg M1)

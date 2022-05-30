@@ -13,7 +13,7 @@ namespace Newt.Writers
         /// <summary>Writes the Graphviz `.dot` file for the schema.</summary>
         public void Write()
         {
-            EnsureFullPathExists("GRAPHVIZ");
+            EnsureFullPathExists("GRAPHVIZ", Namespace);
 
             var src = StartFile($"schema.dot");
             src.AppendLine("// GRAPHVIZ DEFINITION");
@@ -24,8 +24,8 @@ namespace Newt.Writers
             src.AppendLine("");
 
             // Define the graph layout and styling.
-            src.AppendLine(@"digraph G {
-  label = 'SampleAPI'
+            src.AppendLine(@"digraph {
+  label = 'Class diagram for SampleAPI'
   labelloc = 'top'
   fontname = 'Verdana'
   fontsize = 16

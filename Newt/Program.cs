@@ -11,7 +11,7 @@ namespace Newt
         static void Main(string[] args)
         {
             Console.WriteLine();
-            Console.WriteLine("NEWT (build 2022-05-29)");
+            Console.WriteLine("NEWT (build 2022-05-31)");
             Console.WriteLine("Generate a DotNet (C#/EF Core) data access repository project from a Postgres database.");
             var parser = new Parser(args)
                 .RequiresParameter<string>("env", "Environment variable containing the connection string", "")

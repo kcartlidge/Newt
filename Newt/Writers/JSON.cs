@@ -17,7 +17,7 @@ namespace Newt.Writers
         /// <summary>Write a JSON dump for the schema.</summary>
         public void Write()
         {
-            EnsureFullPathExists("JSON DUMP");
+            EnsureFullPathExists("JSON DUMP", Namespace);
 
             var jsonFilename = Path.Combine(TopFolder, Namespace, "schema-dump.json");
             Console.WriteLine(jsonFilename);
