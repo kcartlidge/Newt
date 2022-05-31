@@ -13,6 +13,7 @@ namespace Newt.Models
         public string Name { get; set; }
         public string Comment { get; set; }
         public string Datatype { get; set; }
+        public string DefaultValue { get; set; }
         public int? Capacity { get; set; }
         public bool IsPrimaryKey { get; set; }
         public bool IsNullable { get; set; }
@@ -29,6 +30,9 @@ namespace Newt.Models
         /// <summary>True if Capacity holds a usable value.</summary>
         public bool UseCapacity => Capacity.HasValue && PropertyType != "bool";
 
+        /// <summary>True if the column has a default value.</summary>
+        public bool HasDefault => DefaultValue.HasValue();
+
         public DBColumn(
             int sequence,
             string schema,
@@ -37,6 +41,7 @@ namespace Newt.Models
             string comment,
             bool isNullable,
             string datatype,
+            string defaultValue,
             int? capacity)
         {
             Sequence = sequence;
@@ -46,6 +51,7 @@ namespace Newt.Models
             Comment = comment ?? "";
             IsNullable = isNullable;
             Datatype = datatype;
+            DefaultValue = defaultValue;
             Capacity = capacity;
         }
 

@@ -40,8 +40,6 @@ Add the connection details for your Postgres database to your environment.
 ## Status
 
 This is *beta*. It works and is in active use.
-Column defaults are not currently scripted in the backup SQL.
-
 Make sure you check the database conventions in the contents (below).
 
 ---
@@ -142,16 +140,16 @@ You only get a list in the *parent* entity if the *child* one has a foreign key 
 ## Output
 
 The following represents generated output assuming a namespace of `SampleAPI.Data`.
-The database has a `blog`, a `theme`, and a `post` table.
+The database has an `article`, a `blog`, and a `post` table.
 
 ### Created project files
 
 ```
 SampleAPI.Data/
     Entities/
+        Article.cs
         Blog.cs
         Post.cs
-        Theme.cs
     SQL/
         Postgres.sql
     DataContext.cs
@@ -171,9 +169,9 @@ namespace SampleAPI.Data
 {
     public class DataContext : DbContext
     {
+        public DbSet<Article> Articles { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Post> Posts { get; set; }
-        public DbSet<Theme> Themes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -255,6 +253,9 @@ namespace SampleAPI.Data.Entities
         [DisplayName("Theme Id")]
         public long ThemeId { get; set; }
 
+        /// <summary>Foreign key on Article</summary>
+        public List<Article> Articles { get; set; }
+
         /// <summary>Foreign key on Post</summary>
         public List<Post> Posts { get; set; }
     }
@@ -274,7 +275,7 @@ CREATE TABLE IF NOT EXISTS public.blog (
   title        character varying(50) NOT NULL,
   display      character varying(200) NOT NULL,
   hostname     character varying(100) NOT NULL,
-  theme_id     bigint NOT NULL,
+  theme_id     bigint NOT NULL DEFAULT 1,
 
   CONSTRAINT pk_blog PRIMARY KEY (id),
   CONSTRAINT uq_blog_hostname UNIQUE (hostname),
@@ -294,6 +295,9 @@ At the top of that file are sample commands to render it.
 A Graphviz image generated from sample source is below, with the source itself underneath that.
 Each class lists its properties then the other classes it is linked to by foreign keys.
 For brevity most of the classes have been manually removed from the sample source and image.
+
+Click the image below to open it directly.
+When using Github or similar, you may also need to click for the *Raw* file.
 
 ![Sample Graphviz](./schema.svg)
 
@@ -352,7 +356,7 @@ builder.Services.AddScoped<DataContext>();
 And here's how it might then be used in a controller in a `SampleApi.Api` project.
 
 ``` cs
-// ThemeController.cs
+// ArticlesController.cs
 
 using Microsoft.AspNetCore.Mvc;
 using SampleApi.Data;
@@ -362,21 +366,21 @@ namespace SampleApi.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class ThemeController : ControllerBase
+public class ArticlesController : ControllerBase
 {
-    private readonly ILogger<ThemeController> _logger;
+    private readonly ILogger<ArticlesController> _logger;
     private readonly DataContext _context;
 
-    public ThemeController(ILogger<ThemeController> logger, DataContext context)
+    public ArticlesController(ILogger<ArticlesController> logger, DataContext context)
     {
         _logger = logger;
         _context = context;
     }
 
-    [HttpGet(Name = "ListThemes")]
-    public IEnumerable<Theme> List()
+    [HttpGet(Name = "ListArticles")]
+    public IEnumerable<Article> List()
     {
-        return _context.Themes.OrderBy(x => x.Display).ToArray();
+        return _context.Articles.OrderBy(x => x.Title).ToArray();
     }
 }
 ```

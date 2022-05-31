@@ -79,7 +79,7 @@ namespace Newt.Postgres
         {
             conn.Open();
             var sql =
-                $"SELECT ordinal_position, column_name, is_nullable, data_type, character_maximum_length, " +
+                $"SELECT ordinal_position, column_name, is_nullable, data_type, character_maximum_length, column_default, " +
                 $"       pg_catalog.col_description(format('%s.%s',table_schema,table_name)::regclass::oid,ordinal_position) as column_description " +
                 $"FROM   information_schema.columns " +
                 $"WHERE  table_schema = '{table.Schema}' " +
@@ -90,11 +90,21 @@ namespace Newt.Postgres
                 while (rdr.Read())
                 {
                     int? maxLen = rdr.IsDBNull(4) ? null : rdr.GetInt32(4);
-                    string comment = rdr.IsDBNull(5) ? "" : rdr.GetString(5);
+                    string defaultValue = rdr.IsDBNull(5) ? "" : rdr.GetString(5);
+                    string comment = rdr.IsDBNull(6) ? "" : rdr.GetString(6);
                     if (comment.HasValue() && comment.EndsWith(".") == false)
                     {
                         comment = $"{comment.Trim()}.";
                     }
+
+                    // Deliberately omit sequence nextvals.
+                    // Sequences aren't scripted so no point (and 'serial' covers it anyway).
+                    if (defaultValue.HasValue() &&
+                        defaultValue.ToLowerInvariant().StartsWith("nextval("))
+                    {
+                        defaultValue = "";
+                    }
+
                     table.Columns.Add(new DBColumn(
                         rdr.GetInt32(0),
                         table.Schema,
@@ -103,6 +113,7 @@ namespace Newt.Postgres
                         comment,
                         rdr.GetString(2).ToUpperInvariant() == "YES",
                         rdr.GetString(3),
+                        defaultValue,
                         maxLen));
                 }
             }

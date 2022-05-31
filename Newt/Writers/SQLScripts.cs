@@ -50,12 +50,13 @@ namespace Newt.Writers
             foreach (var c in table.Columns)
             {
                 var nullable = c.IsNullable ? "" : " NOT NULL";
+                var defVal = c.HasDefault ? $" DEFAULT {c.DefaultValue}" : "";
                 var name = c.Name.PadRight(table.ColumnNameWidth);
                 var capacity = c.Capacity.HasValue ? $"({c.Capacity})" : "";
                 var sqlType = c.Datatype + capacity;
                 var isPrimaryKey = table.Constraints.Any(x => x.Column == c.Name && x.IsPrimaryKey);
                 if (isPrimaryKey && c.IsCardinal) sqlType = "BIGSERIAL";
-                src.AppendLine($"  {name}  {sqlType}{nullable},");
+                src.AppendLine($"  {name}  {sqlType}{nullable}{defVal},");
             }
 
             src.AppendLine();

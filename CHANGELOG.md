@@ -3,6 +3,8 @@
 ## 2022-05-31
 
 - Move `.dot` file down a folder
+- Include `default` in SQL scripts
+    - Except `nextval()` functions
 
 ## 2022-05-29
 
