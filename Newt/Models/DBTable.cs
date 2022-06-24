@@ -12,6 +12,7 @@ namespace Newt.Models
         public string Owner { get; }
         public string Schema { get; }
         public string Name { get; }
+        public string Comment { get; set; }
         public List<DBColumn> Columns { get; }
         public List<DBConstraint> Constraints { get; }
         public List<DBIndex> Indexes { get; }
@@ -29,12 +30,13 @@ namespace Newt.Models
         /// <summary>Dot-notated schema and name.</summary>
         private string FullName => $"{Schema}.{Name}";
 
-        public DBTable(string owner, string schema, string name)
+        public DBTable(string owner, string schema, string name, string comment = null)
         {
             _plurals = new Pluralizer();
             Owner = owner;
             Schema = schema;
             Name = name;
+            Comment = comment ?? "";
             Columns = new List<DBColumn>();
             Constraints = new List<DBConstraint>();
             Indexes = new List<DBIndex>();
@@ -43,7 +45,7 @@ namespace Newt.Models
         
         public override string ToString()
         {
-            return $"{FullName}, columns: {Columns.Count}";
+            return $"{FullName}, columns: {Columns.Count}   {Comment}".Trim();
         }
     }
 }

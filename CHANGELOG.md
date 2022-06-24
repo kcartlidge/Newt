@@ -1,5 +1,11 @@
 # CHANGE LOG
 
+## 2022-06-24
+
+- Scan table comments in Postgres
+    - Include table comments in SQL script
+    - Include table comments in entity XmlSummary
+
 ## 2022-05-31
 
 - Move `.dot` file down a folder

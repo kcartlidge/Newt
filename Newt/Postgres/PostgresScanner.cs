@@ -61,15 +61,21 @@ namespace Newt.Postgres
         {
             conn.Open();
             var sql =
-                $"SELECT table_name " +
-                $"FROM   information_schema.tables " +
-                $"WHERE  table_schema = '{db.Schema}'" +
+                $"SELECT table_name, pg_catalog.obj_description(pgc.oid, 'pg_class') as table_description " +
+                $"FROM   information_schema.tables, pg_catalog.pg_class pgc " +
+                $"WHERE  table_name = pgc.relname " +
+                $"AND    table_type='BASE TABLE' " +
+                $"AND    table_schema = '{db.Schema}'" +
                 $"ORDER BY table_name;";
             using (var cmd = new NpgsqlCommand(sql, conn))
             {
                 var rdr = cmd.ExecuteReader();
                 while (rdr.Read())
-                    db.Tables.Add(new DBTable(conn.UserName, db.Schema, rdr.GetString(0)));
+                {
+                    string name = rdr.GetString(0);
+                    string comment = rdr.IsDBNull(1) ? "" : rdr.GetString(1);
+                    db.Tables.Add(new DBTable(conn.UserName, db.Schema, name, comment));
+                }
             }
             conn.Close();
         }

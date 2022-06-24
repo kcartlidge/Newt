@@ -24,13 +24,9 @@ namespace Newt.Writers
             src.AppendLine($"  Schemas created from it may not be complete (eg sequences).");
             src.AppendLine($"");
             src.AppendLine($"  The script should NOT be simply executed in one go!");
-            src.AppendLine($"  Several steps are teken to ensure you need to take care:");
-            src.AppendLine($"");
-            src.AppendLine($"  * DROP statements assume things already exist");
-            src.AppendLine($"    This is deliberate to stop simple execution");
-            src.AppendLine($"");
-            src.AppendLine($"  * The tables are listed alphabetically");
-            src.AppendLine($"    Do them manually in order of dependencies");
+            src.AppendLine($"  Several deliberate restrictions force you to take care:");
+            src.AppendLine($"  - DROP statements assume things already exist");
+            src.AppendLine($"  - Tables are ALPHABETICAL, not in order of dependencies");
             src.AppendLine($"*/");
             foreach (var table in Schema.Tables)
             {
@@ -42,6 +38,8 @@ namespace Newt.Writers
 
         private void GetPostgresScriptForTable(DBTable table, StringBuilder src, string @namespace, bool includeDrop)
         {
+            src.AppendLine($"");
+            src.AppendLine($"");
             src.AppendLine($"-------- {@namespace}.Models.{table.ClassName} --------");
             src.AppendLine($"");
             if (includeDrop) src.AppendLine($"DROP TABLE {table.Schema}.{table.Name} CASCADE;");
@@ -65,8 +63,15 @@ namespace Newt.Writers
                 src.AppendLine($"{c.GetDefinition(--remaining > 0)}");
 
             src.AppendLine($");");
+            src.AppendLine($"");
             src.AppendLine($"ALTER TABLE {table.Schema}.{table.Name} OWNER to {table.Owner};");
             foreach (var c in table.Indexes) src.AppendLine($"{c.Definition};");
+
+            if (table.Comment.HasValue())
+            {
+                var comment = table.Comment.Trim().Replace("'", "''");
+                src.AppendLine($"COMMENT ON TABLE {table.Schema}.{table.Name} IS '{comment}';");
+            }
 
             foreach (var c in table.Columns)
             {

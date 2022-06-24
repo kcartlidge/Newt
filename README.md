@@ -195,6 +195,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SampleAPI.Data.Entities
 {
+    /// <summary>
+    /// Contains the definition of a single blog site.
+    /// </summary>
     [Table("blog")]
     public class Blog
     {
@@ -284,6 +287,7 @@ CREATE TABLE IF NOT EXISTS public.blog (
     ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 ALTER TABLE public.blog OWNER to sampleapi;
+COMMENT ON TABLE public.blog IS 'Contains the definition of a single blog site.';
 COMMENT ON COLUMN public.blog.title IS 'For use in browser tabs, tables, lists etc.';
 ```
 

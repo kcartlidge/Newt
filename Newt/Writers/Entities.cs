@@ -28,6 +28,14 @@ namespace Newt.Writers
                 src.AppendLine($"");
                 src.AppendLine($"namespace {Namespace}.Entities");
                 src.AppendLine($"{{");
+
+                if (table.Comment.HasValue())
+                {
+                    src.AppendLine($"    /// <summary>");
+                    src.AppendLine($"    /// {table.Comment}");
+                    src.AppendLine($"    /// </summary>");
+                }
+
                 src.AppendLine($"    [Table(\"{table.Name}\")]");
                 src.AppendLine($"    public class {table.ClassName}");
                 src.AppendLine($"    {{");
