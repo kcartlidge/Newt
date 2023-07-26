@@ -92,6 +92,8 @@ export DB_CONNSTR="Server=127.0.0.1;Port=5432;Database=coregen;User Id=coregen;P
 The above is an example connection string, not a revealed secret.
 This environment variable is also used by the auto-generated EF Core data context.
 
+On Windows if you use the `set` command rather than `export` then ensure you don't accidentally include the double quotes (`"`) surrounding the value.  If you do, you'll get a message similar to "*Format of the initialization string does not conform to specification starting at index ...*" - in which case the simple solution is to use the Control Panel to set the Environment Variable value.
+
 If you don't have a published Newt binary in your path you can run it from source:
 
 ``` shell
