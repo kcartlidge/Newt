@@ -1,5 +1,10 @@
 # CHANGE LOG
 
+## 2023-08-17
+
+- Bump Npgsql (Postgres) package version
+- Clarify CLI arguments
+
 ## 2022-06-24
 
 - Scan table comments in Postgres

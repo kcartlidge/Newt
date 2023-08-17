@@ -65,18 +65,18 @@ Make sure you check the database conventions in the contents (below).
 The command arguments (which are always displayed at runtime) are as follows.
 
 ``` txt
-NEWT (build 2022-05-28)
+NEWT (build 2023-08-17)
 Generate a DotNet (C#/EF Core) data access repository project from a Postgres database.
 
 -env       <value>   Environment variable containing the connection string (required)
--folder    <value>   Location of the new solution (and nested projects) (required)
+-folder    <value>   Location to create a nested project inside (required)
 -namespace <value>   The top level namespace for the generated C# code (required)
 -schema    <value>   The database schema to generate code for (required)
 
 -force               Overwrite any destination content 
 
 Example:
-  Newt -env DB_CONNSTR -folder "/Source/Core/SampleAPI" -namespace SampleAPI -schema public -force
+  Newt -env DB_CONNSTR -folder "/Source/Core/SampleAPI" -namespace SampleAPI.Data -schema public -force
 ```
 
 Note that the destination `-folder` specifies the *parent* of where it should write to.

@@ -11,17 +11,19 @@ namespace Newt
         static void Main(string[] args)
         {
             Console.WriteLine();
-            Console.WriteLine("NEWT (build 2022-06-24)");
+            Console.WriteLine("NEWT (build 2023-08-17)");
             Console.WriteLine("Generate a DotNet (C#/EF Core) data access repository project from a Postgres database.");
             var parser = new Parser(args)
                 .RequiresParameter<string>("env", "Environment variable containing the connection string", "")
                 .RequiresParameter<string>("schema", "The database schema to generate code for", "public")
-                .RequiresParameter<string>("folder", "Location of the new solution (and nested projects)", "")
+                .RequiresParameter<string>("folder", "Location of the (existing) solution", "")
                 .RequiresParameter<string>("namespace", "The top level namespace for the generated C# code")
                 .SupportsOption("force", "Overwrite any destination content")
                 .Help();
             Console.WriteLine("Example:");
-            Console.WriteLine("  Newt --force -env DB_CONNSTR -schema public -folder \"/Source/Core/SampleAPI\" -namespace SampleAPI");
+            Console.WriteLine("  Newt -env DB_CONNSTR -folder \"/Source/Core/SampleAPI\" -namespace SampleAPI.Data -schema public -force");
+            Console.WriteLine();
+            Console.WriteLine("The namespace will also be used as the project name/subfolder.");
             Console.WriteLine();
 
             try
