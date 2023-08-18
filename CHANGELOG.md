@@ -1,5 +1,10 @@
 # CHANGE LOG
 
+## 2023-08-18
+
+- Include pre-build binaries for Linux, Mac, and Windows
+- Include build scripts for Linux, Mac, and Windows
+
 ## 2023-08-17
 
 - Bump Npgsql (Postgres) package version

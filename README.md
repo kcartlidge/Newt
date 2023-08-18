@@ -5,11 +5,12 @@ Also creates backup SQL and Graphviz `.dot` diagram source.
 
 - [View the changelog](./CHANGELOG.md)
 
+There are [pre-built executables](./builds) ready to run for Linux, Mac, and Windows.
+
 Note that whilst *this code repository* is AGPL there are specifically *no licensing constraints applied to generated output*.
 You are free to apply any license you wish; generated code is entirely yours.
 
-You *must* have the `dotnet` command installed.
-In order to ensure compatible class library generation, your local `dotnet` installation is used at various points.
+You *must* have the `dotnet` command installed (v6+), even if using a pre-built Newt executable, as it is used to create your new project and add packages to it.
 
 ## What Newt does
 
@@ -42,6 +43,8 @@ Add the connection details for your Postgres database to your environment.
 This is *beta*. It works and is in active use.
 Make sure you check the database conventions in the contents (below).
 
+There are [pre-built executables](./builds) ready to run for Linux, Mac, and Windows.
+
 ---
 
 ## Contents
@@ -56,16 +59,17 @@ Make sure you check the database conventions in the contents (below).
     - [Created SQL](#created-sql)
     - [Created Graphviz](#created-graphviz)
 - [Sample Usage](#sample-usage)
+- [Copying a build to somewhere convenient](#copying-a-build-to-somewhere-convenient)
 - [Generating stand-alone builds](#generating-stand-alone-builds)
-    - It's easy to generate for a choice of platforms
-    - Builds are small enough to be checked into source control
+    - [For all target systems in one go](#for-all-target-systems-in-one-go)
+    - [For a single target system](#for-a-single-target-system)
 
 ## Running Newt
 
 The command arguments (which are always displayed at runtime) are as follows.
 
 ``` txt
-NEWT (build 2023-08-17)
+NEWT (build 2023-08-18)
 Generate a DotNet (C#/EF Core) data access repository project from a Postgres database.
 
 -env       <value>   Environment variable containing the connection string (required)
@@ -391,13 +395,50 @@ public class ArticlesController : ControllerBase
 }
 ```
 
+## Copying a build to somewhere convenient
+
+Copy a build to somewhere accessible via your system path and you can run it from anywhere.
+
+For example (Mac):
+
+``` sh
+cd <solution>
+sudo rm -rf /usr/local/bin/Newt
+sudo cp builds/macos-arm64/Newt /usr/local/bin/Newt
+```
+
+Alternatively, as builds are pretty small you can include ones for relevant platforms directly into your own project's repository.
+
 ## Generating stand-alone builds
 
-This can be done with a single command as shown below.
-There are a selection, each targeting a different output system.
+The commands below should be run from within the `Newt/Newt` *project* folder, not the solution. Remember to update the build date in the `Program.cs` console output, README output capture, and the CHANGELOG.
+There are also details available regarding [copying a build to somewhere convenient](#copying-a-build-to-somewhere-convenient).
 
-The commands should be run from within the `Newt/Newt` *project* folder, not the solution.
-Remember to update the build date in the `Program.cs` console output and the CHANGELOG.
+*Do not check in new builds automatically every commit*; only do so when a genuine version and release change occurs.
+
+### For all target systems in one go
+
+There are two scripts you can run in the *project* folder.
+If you are building on Linux/Mac use `build.sh` and on Windows use `build.bat`.
+
+Linux/Mac:
+
+```sh
+cd <project>
+chmod +x build.sh   # for reference; not usually needed
+./build.sh
+```
+
+Windows:
+
+```bat
+cd <project>
+build.bat
+```
+
+Upon completion, both scripts will advise what builds are now available.
+
+### For a single target system
 
 ``` shell
 # Mac, Apple Silicon (eg M1)
@@ -418,13 +459,3 @@ dotnet publish -r win10-x64 -c Release /p:PublishSingleFile=true /p:PublishTrimm
 ```
 
 Whichever command you choose to run, it will tell you in its response where it has placed the binary.
-Copy that somewhere accessible via your system path and you can run it from anywhere.
-
-For example (MacOS):
-
-``` sh
-sudo rm /usr/local/bin/newt
-sudo cp ~/Source/Core/Newt/Newt/bin/Release/net6.0/osx-arm64/publish/Newt /usr/local/bin/newt
-```
-
-*The binary is very small (about 20MB) so you can also check it into source control alongside your main project.*
