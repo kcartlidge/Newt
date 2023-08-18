@@ -15,4 +15,8 @@
       <PackageReference Include="Pluralize.Net" Version="1.0.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Include="build.sh" />
+      <Content Include="build.bat" />
+    </ItemGroup>
 </Project>
