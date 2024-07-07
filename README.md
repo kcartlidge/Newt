@@ -363,6 +363,9 @@ using SampleApi.Data;
 builder.Services.AddScoped<DataContext>();
 ```
 
+*Important note:*
+If you added the connection string environment variable *after* starting your IDE/editor, then you will usually need to restart it.  Any debug/release runs will likely be unable to connect until you do, as the OS only makes available the environment variables that already existed at the time your IDE/editor was launched.
+
 And here's how it might then be used in a controller in a `SampleApi.Api` project.
 
 ``` cs
