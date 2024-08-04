@@ -1,29 +1,30 @@
 using System;
-using Newt.Models;
 
 namespace Newt.Writers
 {
     /// <summary>Registers the required Nuget packages.</summary>
-    internal class NugetPackages : BaseWriter
+    internal static class NugetPackages
     {
-        public NugetPackages(DBSchema db, bool force, string folder, string @namespace)
-            : base(db, force, folder, @namespace)
-        {
-        }
-
         /// <summary>
         /// Register the required Nuget packages using the installed 'dotnet' command.
         /// </summary>
-        public void Write()
+        public static void Write(Config config)
         {
             Console.WriteLine();
             Console.WriteLine("NUGET PACKAGES");
 
-            Console.WriteLine($"Adding nuget references");
-            FileOps.RunCommand("dotnet", $"add {Namespace} package Npgsql", TopFolder);
-            FileOps.RunCommand("dotnet", $"add {Namespace} package Microsoft.EntityFrameworkCore", TopFolder);
-            FileOps.RunCommand("dotnet", $"add {Namespace} package Microsoft.EntityFrameworkCore.InMemory", TopFolder);
-            FileOps.RunCommand("dotnet", $"add {Namespace} package Npgsql.EntityFrameworkCore.PostgreSQL", TopFolder);
+            Console.WriteLine($"Adding nuget references to data project");
+            Support.RunCommand("dotnet", $"add package Npgsql", config.DataProjectFolder);
+            Support.RunCommand("dotnet", $"add package Microsoft.EntityFrameworkCore", config.DataProjectFolder);
+            Support.RunCommand("dotnet", $"add package Microsoft.EntityFrameworkCore.InMemory", config.DataProjectFolder);
+            Support.RunCommand("dotnet", $"add package Npgsql.EntityFrameworkCore.PostgreSQL", config.DataProjectFolder);
+
+            if (config.IncludeWebProject)
+            {
+                Console.WriteLine($"Adding nuget references to web project");
+                Support.RunCommand("dotnet", $"add package Microsoft.EntityFrameworkCore", config.WebProjectFolder);
+                Support.RunCommand("dotnet", $"add package Microsoft.EntityFrameworkCore.Design", config.WebProjectFolder);
+            }
         }
     }
 }

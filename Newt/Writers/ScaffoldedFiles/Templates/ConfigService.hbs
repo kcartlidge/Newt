@@ -1,0 +1,32 @@
+namespace {{ webns }}
+{
+    /// <summary>Holds the app configuration.</summary>
+    public class ConfigService
+    {
+        /// <summary>The administrator password.</summary>
+        /// <remarks>
+        /// This should ideally be moved into a more secure location such
+        /// as the enviroment for example.  It's in the AppSettings by
+        /// default to ensure the initial site runs without dependencies.
+        /// </remarks>
+        public string AdminPassword = "";
+
+        /// <summary>The number of data rows to show per page.</summary>
+        public int PageSize = 10;
+
+        /// <summary>
+        /// The number of links to previous and next pages to show on
+        /// each side of the current one in the pager control.
+        /// </summary>
+        public int PageLinksToShow = 5;
+
+#pragma warning disable CS8601 // Possible null reference assignment.
+        public ConfigService(IConfiguration configuration)
+        {
+            AdminPassword = configuration["AdminPassword"];
+            PageSize = Convert.ToInt32(configuration["PageSize"]);
+            PageLinksToShow = Convert.ToInt32(configuration["PageLinksToShow"]);
+        }
+#pragma warning restore CS8601 // Possible null reference assignment.
+    }
+}

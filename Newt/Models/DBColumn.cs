@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Newt.Mappers;
+﻿using Newt.Mappers;
 using System.Text;
 
 namespace Newt.Models
@@ -21,6 +20,9 @@ namespace Newt.Models
         /// <summary>The ProperCase name of the mapped property.</summary>
         public string PropertyName => Name.SnakeToProper();
 
+        /// <summary>The display name of the mapped property.</summary>
+        public string DisplayName => Name.SnakeToProper(true);
+
         /// <summary>The mapped property's .Net data type.</summary>
         public string PropertyType => Datatype.ToDotNetAndDbType();
 
@@ -32,6 +34,31 @@ namespace Newt.Models
 
         /// <summary>True if the column has a default value.</summary>
         public bool HasDefault => DefaultValue.HasValue();
+
+        /// <summary>The CSS column width.</summary>
+        public string CssColumnWidth => PropertyType.GetCssColWidth(UseCapacity, Capacity);
+
+        /// <summary>True if the editor height is more than 1.</summary>
+        public bool MultilineInput => EditorHeight > 1;
+
+        /// <summary>
+        /// Rows to show for a text field or a long string
+        /// one, with a default of 1 for everything else.
+        /// </summary>
+        public int EditorHeight
+        {
+            get
+            {
+                if (Datatype == "text") return 25;
+                if (PropertyType == "string" && UseCapacity)
+                {
+                    if (Capacity > 100) return 4;
+                    if (Capacity > 70) return 3;
+                    if (Capacity > 50) return 2;
+                }
+                return 1;
+            }
+        }
 
         public DBColumn(
             int sequence,
@@ -87,7 +114,7 @@ namespace Newt.Models
             if (IsPrimaryKey) src.AppendLine($"        [Key]");
             if (!IsNullable) src.AppendLine($"        [Required]");
             src.AppendLine($"        [Column(\"{Name}\")]");
-            src.AppendLine($"        [DisplayName(\"{Name.SnakeToProper(true)}\")]");
+            src.AppendLine($"        [DisplayName(\"{DisplayName}\")]");
             var nullableProp = (IsNullable ? "?" : "");
             src.AppendLine($"        public {PropertyType}{nullableProp} {PropertyName} {{ get; set; }}");
             return src.ToString();

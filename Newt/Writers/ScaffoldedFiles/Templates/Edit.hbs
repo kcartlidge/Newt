@@ -1,0 +1,44 @@
+@model {{ datans }}.Entities.{{ name }}
+
+@{
+    ViewData["Title"] = "Edit {{ name }}";
+}
+
+<h1>Edit {{ name }}</h1>
+
+<form asp-action="Edit">
+    <div>
+        <div>
+            <input type="submit" value="Save" class="success" />
+            <a asp-action="Index" class="link-button">Back</a>
+        </div>
+    </div>
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    {{ #readonlycolumns }}
+    <fieldset>
+        <label asp-for="{{ propertyname }}"></label>
+        <div class="readonly-value">@Model.{{ propertyname }}</div>
+    </fieldset>
+    {{ /readonlycolumns }}
+
+    {{ #editablecolumns }}
+    <fieldset>
+        <label asp-for="{{ propertyname }}"></label>
+        {{ #if multilineinput }}
+        <textarea asp-for="{{ propertyname }}" rows="{{ editorheight }}" {{ #if @first }}autofocus{{ /if }} class="input-{{ csscolumnwidth }}"></textarea>
+        {{ else }}
+        <input asp-for="{{ propertyname }}" {{ #if @first }}autofocus{{ /if }} type="text" class="input-{{ csscolumnwidth }}" />
+        {{ /if }}
+        <span asp-validation-for="{{ propertyname }}" class="danger"></span>
+    </fieldset>
+    {{ /editablecolumns }}
+
+    <div>
+        <div>
+            <input type="submit" value="Save" class="success" />
+            <a asp-action="Index" class="link-button">Back</a>
+        </div>
+    </div>
+</form>

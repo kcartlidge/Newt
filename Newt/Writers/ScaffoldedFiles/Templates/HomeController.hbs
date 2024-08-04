@@ -1,0 +1,70 @@
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using {{ webns }}.Models;
+
+namespace {{ webns }}.Controllers
+{
+    public class HomeController : Controller
+    {
+        private readonly ConfigService _configuration;
+
+        public HomeController(ConfigService configuration)
+        {
+            _configuration = configuration;
+        }
+
+        // GET: Home
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        // GET: Login
+        [HttpGet]
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        // POST: Login
+        [HttpPost]
+        public async Task<ActionResult> Login([FromForm] LoginRequestViewModel request)
+        {
+            if (ModelState.IsValid)
+            {
+                request.Password = request.Password.Trim();
+                var correctPassword = _configuration.AdminPassword;
+                if (!string.IsNullOrWhiteSpace(correctPassword)
+                    && request.Password == correctPassword)
+                {
+                    var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+                    identity.AddClaim(new Claim(ClaimTypes.Name, "ADMIN"));
+                    var principal = new ClaimsPrincipal(identity);
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                    return RedirectToAction("Index", "Home");
+                }
+                ModelState.AddModelError("Password", "Unable to sign you in with the details provided.");
+            }
+            return View();
+        }
+
+        // GET: Logout
+        [Authorize()]
+        public ActionResult Logout()
+        {
+            return View();
+        }
+
+        // POST: Logout
+        [Authorize()]
+        public async Task<ActionResult> LogoutPost()
+        {
+            // await HttpContext.SignOutAsync();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Home");
+        }
+    }
+}

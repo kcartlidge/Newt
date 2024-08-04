@@ -1,0 +1,16 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
+
+namespace {{ webns }}.Models
+{
+    /// <summary>Model for a login view.</summary>
+    public class LoginRequestViewModel
+    {
+        /// <summary>Password.</summary>
+        [Required]
+        [DisplayName("Password")]
+        [MinLength(5, ErrorMessage = "The password is a minimum of 5 characters.")]
+        [MaxLength(40, ErrorMessage = "The password must be 40 characters or less.")]
+        public string Password { get; set; } = "";
+    }
+}

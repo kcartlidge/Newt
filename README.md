@@ -3,6 +3,10 @@
 Autogenerate a .Net (C#/EF Core) data project (class library with entities and data contexts) from a Postgres database.
 Also creates backup SQL and Graphviz `.dot` diagram source.
 
+If a Solution doesn't exist in the main folder then a new one is created.
+The Data and optional Web project are both added to it.
+*Existing Solution files are not updated.*
+
 - [View the changelog](./CHANGELOG.md)
 
 There are [pre-built executables](./builds) ready to run for Linux, Mac, and Windows.
@@ -25,6 +29,9 @@ Add the connection details for your Postgres database to your environment.
         - With automatic .Net class/property naming conventions
         - An InMemory context for testing etc
         - A Postgres context ready for use
+    - Optionally create an ASP.Net MVC Web project
+    - Create a Solution file if one doesn't already exist
+        - Add the Data and optional Web project to it
     - Create entity models (classes) for each table
         - With automatic .Net class/property naming conventions
         - With data annotations for keys, types, lengths etc
@@ -69,18 +76,30 @@ There are [pre-built executables](./builds) ready to run for Linux, Mac, and Win
 The command arguments (which are always displayed at runtime) are as follows.
 
 ``` txt
-NEWT (build 2023-08-18)
-Generate a DotNet (C#/EF Core) data access repository project from a Postgres database.
+NEWT (build 2024-07-12)
+Generates a DotNet (C#/EF Core) data access repository project from a Postgres database.
+Optionally also creates a matching MVC site for data management.
 
--env       <value>   Environment variable containing the connection string (required)
--folder    <value>   Location to create a nested project inside (required)
--namespace <value>   The top level namespace for the generated C# code (required)
--schema    <value>   The database schema to generate code for (required)
+If the parent folder has no solution it will be created and the project(s) added.
+Existing solutions will NOT be updated to include new project(s).
 
--force               Overwrite any destination content 
+
+-env           <value>   Environment variable containing the connection string (required)
+-folder        <value>   Location of the (existing) solution (required)
+-namespace     <value>   The top level namespace for the generated C# code (required)
+-schema        <value>   The database schema to generate code for (required)
+-solution      <value>   The name of the .Net Solution
+-web-namespace <value>   If provided, an MVC web project is also generated
+
+-force                   Overwrite any destination content
 
 Example:
-  Newt -env DB_CONNSTR -folder "/Source/Core/SampleAPI" -namespace SampleAPI.Data -schema public -force
+  Newt -env DB_CONNSTR -folder "/Source/Core/SampleAPI"
+       -namespace SampleAPI.Data -web-namespace SampleAPI.Admin
+       -schema public -force -solution SampleAPI
+
+The solution name is used if a new solution needs creating.
+Namespaces will also be used as project names/subfolders.
 ```
 
 Note that the destination `-folder` specifies the *parent* of where it should write to.
@@ -106,6 +125,20 @@ dotnet run --project Newt -- -env DB_CONNSTR -schema public -folder ~/SampleAPI 
 ```
 
 Note the extra `--` before `-env` which is *required*.
+
+If a Solution file doesn't alrady exist at the top level a new one is created.
+For this to happen you need to provide the `-solution` parameter.
+
+If you provide a `-web-namespace` parameter then an ASP.Net MVC Web project is also created.
+For a new solution any created projects are added to it.
+
+Efforts are made to not 'damage' any enclosing solution as it may be your own code.
+
+- Using `-force` will *not* remove any existing Solution file
+- *Any* existing Solution file stops one being created or projects added
+- To totally regenerate things you need to manually remove the Solution file
+
+As a precaution you are *strongly advised* to commit to source control before running!
 
 ## Database conventions
 
@@ -149,6 +182,11 @@ The following represents generated output assuming a namespace of `SampleAPI.Dat
 The database has an `article`, a `blog`, and a `post` table.
 
 ### Created project files
+
+You will optionally get a Solution and possibly a Web (admin) project.
+They are standard off-the shelf projects.
+
+Here's the Data project's files/folders:
 
 ```
 SampleAPI.Data/

@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Newt.Models;
@@ -5,17 +7,17 @@ using Newt.Models;
 namespace Newt.Writers
 {
     /// <summary>Creates the emergency-use SQL scripts for the schema.</summary>
-    internal class SqlScripts : BaseWriter
+    internal static class SqlScripts
     {
-        public SqlScripts(DBSchema db, bool useForce, string folder, string @namespace)
-            : base(db, useForce, folder, @namespace) { }
-
         /// <summary>Write the emergency-use SQL scripts for the schema.</summary>
-        public void Write()
+        public static void Write(Config config)
         {
-            EnsureFullPathExists("SQL SCRIPT", "SQL");
+            Console.WriteLine();
+            Console.WriteLine("SQL SCRIPT");
+            Support.EnsureFullPathExists(config.DataProjectFolder, "SQL");
 
-            var src = StartFile($"Postgres.sql");
+            var filename = Path.Join(config.DataProjectFolder, "SQL", "Postgres.sql");
+            var src = new StringBuilder();
             src.AppendLine($"/*");
             src.AppendLine($"  WARNING - DESTRUCTIVE SCRIPT");
             src.AppendLine($"  This is a fallback script only, NOT a structural database backup.");
@@ -28,19 +30,20 @@ namespace Newt.Writers
             src.AppendLine($"  - DROP statements assume things already exist");
             src.AppendLine($"  - Tables are ALPHABETICAL, not in order of dependencies");
             src.AppendLine($"*/");
-            foreach (var table in Schema.Tables)
+            foreach (var table in config.Schema.Tables)
             {
                 src.AppendLine($"");
-                GetPostgresScriptForTable(table, src, Namespace, true);
+                GetPostgresScriptForTable(table, src, config.DataNamespace, true);
             }
-            FinishFile();
+
+            Support.WriteFileWithChecks(filename, config.OverwriteData, src.ToString());
         }
 
-        private void GetPostgresScriptForTable(DBTable table, StringBuilder src, string @namespace, bool includeDrop)
+        private static void GetPostgresScriptForTable(DBTable table, StringBuilder src, string dbNamespace, bool includeDrop)
         {
             src.AppendLine($"");
             src.AppendLine($"");
-            src.AppendLine($"-------- {@namespace}.Models.{table.ClassName} --------");
+            src.AppendLine($"-------- {dbNamespace}.Models.{table.ClassName} --------");
             src.AppendLine($"");
             if (includeDrop) src.AppendLine($"DROP TABLE {table.Schema}.{table.Name} CASCADE;");
 
