@@ -1,40 +1,41 @@
 using System;
-using Newt.Models;
+using System.IO;
+using System.Text;
 
 namespace Newt.Writers
 {
     /// <summary>Writes the EF Core context definitions.</summary>
-    internal class Contexts : BaseWriter
+    internal static class Contexts
     {
-        private readonly string _envVar;
-
-        public Contexts(DBSchema db, bool force, string folder, string @namespace, string envVar)
-            : base(db, force, folder, @namespace)
-        {
-            _envVar = envVar;
-        }
-
         /// <summary>Write the contexts for both InMemory and Postgres.</summary>
-        public void Write()
+        public static void Write(Config config)
         {
-            EnsureFullPathExists("EF CORE CONTEXTS");
+            Console.WriteLine();
+            Console.WriteLine("EF CORE CONTEXTS");
+            Support.EnsureFullPathExists(config.DataProjectFolder);
+
+            var filename = Path.Combine(config.DataProjectFolder, "UtcDateAnnotation.cs");
+            var utcFixSource = ScaffoldedFiles.Scaffold.GetSource(config, "UtcDateAnnotation",
+                    config.DataNamespace, config.WebNamespace, null);
+            Support.WriteFileWithChecks(filename, config.OverwriteData, utcFixSource);
 
             foreach (var contextType in new[] { "Data", "InMemoryData" })
             {
-                var src = StartFile($"{contextType}Context.cs");
+                filename = Path.Combine(config.DataProjectFolder, $"{contextType}Context.cs");
+                var src = new StringBuilder();
                 src.AppendLine($"#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor.");
                 if (contextType == "Data")
                     src.AppendLine($"#pragma warning disable CS8604 // Possible null reference argument.");
                 src.AppendLine($"");
                 src.AppendLine($"using System;");
                 src.AppendLine($"using Microsoft.EntityFrameworkCore;");
-                src.AppendLine($"using {Namespace}.Entities;");
+                src.AppendLine($"using {config.DataNamespace}.Entities;");
                 src.AppendLine($"");
-                src.AppendLine($"namespace {Namespace}");
+                src.AppendLine($"namespace {config.DataNamespace}");
                 src.AppendLine($"{{");
                 src.AppendLine($"    public class {contextType}Context : DbContext");
                 src.AppendLine($"    {{");
-                foreach (var table in Schema.Tables)
+                foreach (var table in config.Schema.Tables)
                 {
                     if (table.ClassName == table.ClassNamePlural)
                         throw new Exception($"Table name must be singular, not plural: {table.Name}");
@@ -46,7 +47,7 @@ namespace Newt.Writers
                 src.AppendLine($"        {{");
                 if (contextType == "Data")
                 {
-                    src.AppendLine($"            var connectionString = Environment.GetEnvironmentVariable(\"{_envVar}\");");
+                    src.AppendLine($"            var connectionString = Environment.GetEnvironmentVariable(\"{config.EnvironmentVariableName}\");");
                     src.AppendLine($"            optionsBuilder.UseNpgsql(connectionString);");
                 }
                 else
@@ -54,13 +55,19 @@ namespace Newt.Writers
                     src.AppendLine($"            optionsBuilder.UseInMemoryDatabase(databaseName: \"InMemoryDataContext\");");
                 }
                 src.AppendLine($"        }}");
+                src.AppendLine($"");
+                src.AppendLine($"        protected override void OnModelCreating(ModelBuilder builder)");
+                src.AppendLine($"        {{");
+                src.AppendLine($"             builder.ApplyUtcDateTimeConverter();");
+                src.AppendLine($"        }}");
                 src.AppendLine($"    }}");
                 src.AppendLine($"}}");
                 src.AppendLine($"");
                 src.AppendLine($"#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor.");
                 if (contextType == "Data")
                     src.AppendLine($"#pragma warning restore CS8604 // Possible null reference argument.");
-                FinishFile();
+
+                Support.WriteFileWithChecks(filename, config.OverwriteData, src.ToString());
             }
         }
     }

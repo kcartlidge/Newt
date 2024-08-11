@@ -1,21 +1,22 @@
+using System;
+using System.IO;
 using System.Linq;
 using System.Text;
-using Newt.Models;
 
 namespace Newt.Writers
 {
     /// <summary>Creates the Graphviz `.dot` file for the schema.</summary>
-    internal class Graphviz : BaseWriter
+    internal static class Graphviz
     {
-        public Graphviz(DBSchema db, bool useForce, string folder, string @namespace)
-            : base(db, useForce, folder, @namespace) { }
-
         /// <summary>Writes the Graphviz `.dot` file for the schema.</summary>
-        public void Write()
+        public static void Write(Config config)
         {
-            EnsureFullPathExists("GRAPHVIZ", Namespace);
+            Console.WriteLine();
+            Console.WriteLine("GRAPHVIZ");
+            Support.EnsureFullPathExists(config.DataProjectFolder);
 
-            var src = StartFile($"schema.dot");
+            var filename = Path.Combine(config.DataProjectFolder, "schema.dot");
+            var src = new StringBuilder();
             src.AppendLine("// GRAPHVIZ DEFINITION");
             src.AppendLine("//");
             src.AppendLine("// Example usage:");
@@ -44,11 +45,11 @@ namespace Newt.Writers
   edge[
     arrowhead = 'dot'
   ]
-").Replace("'", "\"").Replace("SampleAPI", Namespace);
+").Replace("'", "\"").Replace("SampleAPI", config.DataNamespace);
 
             // Write the tables and their columns.
             src.AppendLine("  // Classes.");
-            foreach (var table in Schema.Tables)
+            foreach (var table in config.Schema.Tables)
             {
                 var def = new StringBuilder($"  {table.ClassName} [ label = \"{{{table.ClassName}");
 
@@ -86,7 +87,7 @@ namespace Newt.Writers
 
             // Write the table relationships.
             var first = true;
-            foreach (var table in Schema.Tables)
+            foreach (var table in config.Schema.Tables)
             {
                 if (table.NavigationProperties.Any())
                 {
@@ -99,7 +100,7 @@ namespace Newt.Writers
                     foreach (var navigation in table.NavigationProperties)
                     {
                         var tableFrom = navigation.Constraint?.ForeignTable ?? "src";
-                        var classFrom = Schema.Tables.First(x => x.Name == tableFrom).ClassName;
+                        var classFrom = config.Schema.Tables.First(x => x.Name == tableFrom).ClassName;
                         var classTo = navigation.Constraint?.Table.ClassName ?? "dest";
                         src.AppendLine($"  {classFrom} -> {classTo}");
                     }
@@ -107,7 +108,8 @@ namespace Newt.Writers
             }
 
             src.AppendLine("}");
-            FinishFile();
+
+            Support.WriteFileWithChecks(filename, config.OverwriteData, src.ToString());
         }
     }
 }

@@ -1,30 +1,23 @@
 using System;
-using System.IO;
-using Newt.Models;
 
 namespace Newt.Writers
 {
-    /// <summary>Creates the .Net project.</summary>
-    internal class DataProject : BaseWriter
+    /// <summary>Creates the .Net data project.</summary>
+    internal static class DataProject
     {
-        public DataProject(DBSchema db, bool force, string folder, string @namespace)
-            : base(db, force, folder, @namespace)
-        {
-        }
-
         /// <summary>
         /// Create the .Net project using the installed 'dotnet' command.
         /// </summary>
-        public void Write()
+        public static void Write(Config config)
         {
             Console.WriteLine();
             Console.WriteLine("DATA PROJECT");
 
             Console.WriteLine("Creating project");
-            FileOps.RunCommand("dotnet", $"new classlib -n {Namespace}", TopFolder);
+            Support.RunCommand("dotnet", $"new classlib -n {config.DataNamespace}", config.SolutionFolder);
             
             Console.WriteLine($"Removing default class file");
-            FileOps.RemoveFile(Path.Combine(TopFolder, Namespace), "Class1.cs");
+            Support.RemoveFile(config.DataProjectFolder, "Class1.cs");
         }
     }
 }

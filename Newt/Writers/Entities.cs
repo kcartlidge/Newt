@@ -1,22 +1,24 @@
+using System;
+using System.IO;
 using System.Linq;
-using Newt.Models;
+using System.Text;
 
 namespace Newt.Writers
 {
     /// <summary>Creates the .Net EF Core entity models.</summary>
-    internal class Entities : BaseWriter
+    internal static class Entities
     {
-        public Entities(DBSchema db, bool force, string folder, string @namespace)
-            : base(db, force, folder, @namespace) { }
-
         /// <summary>Write all the .Net EF Core entity models.</summary>
-        public void Write()
+        public static void Write(Config config)
         {
-            EnsureFullPathExists("ENTITIES", "Entities");
+            Console.WriteLine();
+            Console.WriteLine("ENTITIES");
+            Support.EnsureFullPathExists(config.DataProjectFolder, "Entities");
 
-            foreach (var table in Schema.Tables)
+            foreach (var table in config.Schema.Tables)
             {
-                var src = StartFile($"{table.ClassName}.cs");
+                var filename = Path.Combine(config.DataProjectFolder, "Entities", $"{table.ClassName}.cs");
+                var src = new StringBuilder();
                 src.AppendLine($"#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.");
                 src.AppendLine($"");
                 src.AppendLine($"using System;");
@@ -26,7 +28,7 @@ namespace Newt.Writers
                 src.AppendLine($"using System.ComponentModel.DataAnnotations;");
                 src.AppendLine($"using System.ComponentModel.DataAnnotations.Schema;");
                 src.AppendLine($"");
-                src.AppendLine($"namespace {Namespace}.Entities");
+                src.AppendLine($"namespace {config.DataNamespace}.Entities");
                 src.AppendLine($"{{");
 
                 if (table.Comment.HasValue())
@@ -54,14 +56,15 @@ namespace Newt.Writers
                     var clsNames = navigation.Constraint?.Table.ClassNamePlural;
                     src.AppendLine();
                     src.AppendLine($"        /// <summary>Foreign key on {clsName}</summary>");
-                    src.AppendLine($"        public List<{clsName}> {clsNames} {{ get; set; }}");
+                    src.AppendLine($"        public List<{clsName}> {clsNames} {{ get; set; }} = new List<{clsName}>();");
                 }
 
                 src.AppendLine($"    }}");
                 src.AppendLine($"}}");
                 src.AppendLine($"");
                 src.AppendLine($"#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.");
-                FinishFile();
+
+                Support.WriteFileWithChecks(filename, config.OverwriteData, src.ToString());
             }
         }
     }

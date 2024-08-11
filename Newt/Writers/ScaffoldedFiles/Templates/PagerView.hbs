@@ -1,0 +1,37 @@
+@model {{ webns }}.Models.PagerData
+
+@if(Model.TotalRows > 0)
+{
+<tr>
+    <td colspan="@Model.PagerWidth" class="pager">
+        <span>
+            <a href="?page=1">|&lt;</a>
+            <a href="?page=@Model.PreviousPage">&lt;</a>
+            Page @Model.PageNumber
+            <a href="?page=@Model.NextPage">&gt;</a>
+            <a href="?page=@Model.PageCount">&gt;|</a>
+        </span>
+        <span>
+            Total Pages: @Model.PageCount
+        </span>
+        <span>
+            Items: @Model.TotalRows
+        </span>
+        @if(Model.PageLinksPrevious.Any() || Model.PageLinksNext.Any())
+        {
+            <hr />
+            <span>
+                @foreach (var pg in Model.PageLinksPrevious)
+                {
+                    <a href="?page=@pg">@pg</a>
+                }
+                @Model.PageNumber
+                @foreach (var pg in Model.PageLinksNext)
+                {
+                    <a href="?page=@pg">@pg</a>
+                }
+            </span>
+        }
+    </td>
+</tr>
+}

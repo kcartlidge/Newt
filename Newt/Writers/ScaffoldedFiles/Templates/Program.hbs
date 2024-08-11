@@ -1,0 +1,73 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using {{ datans }};
+
+namespace {{ webns }}
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
+
+            // Register the EF Core data context and add services.
+            builder.Services.AddDbContext<DataContext>();
+            builder.Services.AddSingleton<ConfigService>();
+            builder.Services.AddSingleton<SessionService>();
+
+            // Configure cookie-based session authentication and form validation.
+            builder.Services.AddAntiforgery(o => { o.Cookie.Name = "Newt-{{ webns }}-Antiforgery"; });
+            builder.Services
+                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(o =>
+                {
+                    o.Cookie.HttpOnly = true;
+                    o.Cookie.SameSite = SameSiteMode.Strict;
+                    o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    o.Cookie.Name = "Newt-{{ webns }}-Auth";
+                    o.ExpireTimeSpan = TimeSpan.FromMinutes(120);
+                    o.LoginPath = "/Home/Login";
+                    o.AccessDeniedPath = "/Home/Login";
+                    o.SlidingExpiration = true;
+                });
+
+            // Add and configure the session.
+            builder.Services.AddSession(o =>
+            {
+                o.Cookie.HttpOnly = true;
+                o.Cookie.SameSite = SameSiteMode.Strict;
+                o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                o.Cookie.Name = "Newt-{{ webns }}-UI";
+                o.Cookie.MaxAge = TimeSpan.FromMinutes(120);
+            });
+
+            // Automatically register all the controllers.
+            builder.Services.AddControllersWithViews();
+
+            var app = builder.Build();
+
+            // Configure the HTTP request pipeline.
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseExceptionHandler("/Home/Error");
+
+                // The default HSTS value is 30 days.
+                // You may want to change this for production scenarios,
+                // see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
+
+            // Add the extra middleware etc.
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseSession();
+
+            // Start the app.
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
+            app.Run();
+        }
+    }
+}

@@ -1,0 +1,70 @@
+namespace {{ webns }}.Models
+{
+    /// <summary>Holds data for paging. Page numbers are 1-based.</summary>
+    public class PagerData
+    {
+        public int TotalRows { get; private set; } = 0;
+        public int PagerWidth { get; private set; } = 1;
+
+        public int PageSize { get; private set; } = 10;
+        public int PageNumber { get; private set; } = 1;
+
+        public int PageCount { get; private set; } = 0;
+        public int PreviousPage { get; private set; } = 0;
+        public int NextPage { get; private set; } = 0;
+        public List<int> PageLinksPrevious { get; private set; } = new();
+        public List<int> PageLinksNext { get; private set; } = new();
+
+        public int RowOffset { get; private set; } = 0;
+
+        public PagerData(
+            int totalRows,
+            int pagerWidth,
+            int pageSize,
+            int pageNumber,
+            int pageLinksToShow
+        )
+        {
+            TotalRows = totalRows;
+            PagerWidth = pagerWidth;
+            PageSize = pageSize;
+            PageNumber = pageNumber;
+
+            // This caculation forces rounding-up.
+            PageCount = (TotalRows + PageSize - 1) / PageSize;
+
+            // Limit the page number to a valid one.
+            PageNumber = Math.Min(PageCount, Math.Max(1, PageNumber));
+
+            // Derive some navigational basics.
+            PreviousPage = Math.Max(1, PageNumber - 1);
+            NextPage = Math.Min(PageCount, PageNumber + 1);
+            RowOffset = (PageNumber - 1) * PageSize;
+
+            if (totalRows > 0)
+            {
+                // Generate a naive window of page numbers.
+                var pageWindow = new List<int>();
+                for (var i = PageNumber - pageLinksToShow; i <= PageNumber + pageLinksToShow ; i++)
+                    pageWindow.Add(i);
+
+                // Remove all those that are out of range.
+                pageWindow = pageWindow.Where(x => x >= 1 && x <= PageCount).ToList();
+
+                // Append replacements at the higher end, assuming they exist.
+                var shortFall = Math.Abs(pageWindow.Count - (pageLinksToShow * 2 + 1));
+                for(var i = 0; i < shortFall; i++) pageWindow.Add(pageWindow.Max() + 1);
+                pageWindow = pageWindow.Where(x => x <= PageCount).ToList();
+
+                // Backfill replacements at the lower end, assuming they exist.
+                shortFall = Math.Abs(pageWindow.Count - (pageLinksToShow * 2 + 1));
+                for (var i = 0; i < shortFall; i++) pageWindow.Insert(0, pageWindow.Min() - 1);
+                pageWindow = pageWindow.Where(x => x >= 1).ToList();
+
+                // Split into previous and next links.
+                PageLinksPrevious = pageWindow.Where(x => x < PageNumber).ToList();
+                PageLinksNext = pageWindow.Where(x => x > PageNumber).ToList();
+            }
+        }
+    }
+}
