@@ -11,6 +11,14 @@ namespace Newt
         }
 
         /// <summary>
+        /// Returns the provided string if it has a value, else the defaultText.
+        /// </summary>
+        public static string Or(this string value, string defaultText)
+        {
+            return value.HasValue() ? value.ToString() : defaultText;
+        }
+
+        /// <summary>
         /// Returns a 'snake_case' string value in 'ProperCase' format.
         /// The string is expected to contain words separated by underscores.
         /// This matches the naming conventionals in Postgres.

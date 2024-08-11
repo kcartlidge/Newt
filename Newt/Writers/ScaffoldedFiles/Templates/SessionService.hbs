@@ -1,0 +1,30 @@
+using Microsoft.AspNetCore.Mvc;
+
+namespace {{ webns }}
+{
+    public class SessionService
+    {
+        public string GetSortField(HttpRequest request, string controllerName)
+            => GetStringField(request, $"{controllerName}-SF");
+
+        public void SetSortField(HttpResponse response, string controllerName, string columnName)
+            => SetStringField(response, $"{controllerName}-SF", columnName);
+
+        public bool GetSortDescending(HttpRequest request, string controllerName)
+            => GetStringField(request, $"{controllerName}-SD") == "D";
+
+        public void SetSortDescending(HttpResponse response, string controllerName, bool sortDescending)
+            => SetStringField(response, $"{controllerName}-SD",
+                sortDescending ? "D" : "A");
+
+        private string GetStringField(HttpRequest request, string key)
+        {
+            return request.HttpContext.Session.GetString(key) ?? "";
+        }
+
+        private void SetStringField(HttpResponse response, string key, string value)
+        {
+            response.HttpContext.Session.SetString(key, value ?? "");
+        }
+    }
+}

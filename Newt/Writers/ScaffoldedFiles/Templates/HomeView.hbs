@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Newt Administration";
+	var loggedIn = (User != null && User.Identity != null && User.Identity.IsAuthenticated);
+}
+<h1>Database Administration</h1>
+<div>
+    Welcome to the <strong>Newt</strong> database administration site.
+</div>
+
+@if (loggedIn)
+{
+    <p>
+        Use the menu strip across the top to access the data.<br/>
+        You may also navigate directly from the list below.
+    </p>
+
+    <ul>
+    {{ #tables }}
+        <li>
+            <a asp-controller="{{ classnameplural }}" asp-action="Index">{{ classnameplural }}</a>
+            {{ #if comment }}- {{ comment }} {{ /if }}
+        </li>
+    {{ /tables }}
+    </ul>
+}
+else
+{
+    <div class="info">Sign in using the menu option above.</div>
+}

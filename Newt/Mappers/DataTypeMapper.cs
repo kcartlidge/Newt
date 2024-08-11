@@ -71,5 +71,37 @@ namespace Newt.Mappers
                     return "object";
             }
         }
+
+        /// <summary>Get CSS column width.</summary>
+        public static string GetCssColWidth(
+            this string dotnetType,
+            bool useCapacity,
+            int? capacity)
+        {
+            switch (dotnetType.Trim().ToLowerInvariant())
+            {
+                case "short":
+                case "int":
+                case "long":
+                case "decimal":
+                case "float":
+                case "double":
+                case "bool":
+                    return "narrow";
+                case "datetime":
+                case "timespan":
+                    return "medium";
+                case "string":
+                    if (useCapacity && capacity != null)
+                    {
+                        if (capacity > 20) return "wide";
+                        if (capacity > 10) return "medium";
+                        return "narrow";
+                    }
+                    return "wide";
+                default:
+                    return "wide";
+            }
+        }
     }
 }

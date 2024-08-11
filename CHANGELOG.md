@@ -1,62 +1,56 @@
 # CHANGE LOG
 
-## 2023-08-18
-
-- Include pre-build binaries for Linux, Mac, and Windows
-- Include build scripts for Linux, Mac, and Windows
-
-## 2023-08-17
-
-- Bump Npgsql (Postgres) package version
-- Clarify CLI arguments
-
-## 2022-06-24
-
-- Scan table comments in Postgres
-    - Include table comments in SQL script
-    - Include table comments in entity XmlSummary
-
-## 2022-05-31
-
-- Move `.dot` file down a folder
-- Include `default` in SQL scripts
-    - Except `nextval()` functions
-
-## 2022-05-29
-
-- Write Graphiz `.dot` source
-
-## 2022-05-28
-
-- Write JSON schema dump
-
-## 2022-05-27
-
-- Tidied up the code
-- Added extra `XmlSummary` comments
-- Updated the README file
-- Added column comments
-
-## 2022-01-05
-
-- Initial project created
-- Standard repo files added
-- Parse command arguments
-- Scan Postgres
-- Clear destination folder
-- Create data project
-- Create SQL script
-    - Columns
-    - Primary keys
-    - Foreign keys
-    - Indexes
-- Create entities
-    - Data annotations applied
-        - Key, Required, MaxLength, DisplayName
-- Create EF contexts
-    - InMemory
-    - Postgres
-- Navigation properties
-    - Derived from foreign keys
-    - Currently one way only
-        - Where an A has B's, A gets a List<B>
+- 2024-08-11
+    - Generate ASP.Net MVC admin site project
+    - Generate new Solution file if one doesn't already exist
+        - Add Data and Web projects to the *new* Solution file
+        - *Existing* Solution files are *not* automatically updated
+        - Include standard solution files (eg gitignore)
+    - Gneerate login page
+    - Generate admin pages
+        - Include column sorting and table paging
+- 2023-08-18
+    - Include pre-build binaries for Linux, Mac, and Windows
+    - Include build scripts for Linux, Mac, and Windows
+- 2023-08-17
+    - Bump Npgsql (Postgres) package version
+    - Clarify CLI arguments
+- 2022-06-24
+    - Scan table comments in Postgres
+        - Include table comments in SQL script
+        - Include table comments in entity XmlSummary
+- 2022-05-31
+    - Move `.dot` file down a folder
+    - Include `default` in SQL scripts
+        - Except `nextval()` functions
+- 2022-05-29
+    - Write Graphiz `.dot` source
+- 2022-05-28
+    - Write JSON schema dump
+- 2022-05-27
+    - Tidied up the code
+    - Added extra `XmlSummary` comments
+    - Updated the README file
+    - Added column comments
+- 2022-01-05
+    - Initial project created
+    - Standard repo files added
+    - Parse command arguments
+    - Scan Postgres
+    - Clear destination folder
+    - Create data project
+    - Create SQL script
+        - Columns
+        - Primary keys
+        - Foreign keys
+        - Indexes
+    - Create entities
+        - Data annotations applied
+            - Key, Required, MaxLength, DisplayName
+    - Create EF contexts
+        - InMemory
+        - Postgres
+    - Navigation properties
+        - Derived from foreign keys
+        - Currently one way only
+            - Where an A has B's, A gets a List<B>

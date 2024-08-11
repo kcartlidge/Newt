@@ -1,0 +1,277 @@
+﻿using {{ datans }};
+using {{ datans }}.Entities;
+using {{ webns }}.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace {{ webns }}.Controllers
+{
+    public class {{ plural }}Controller : Controller
+    {
+        private readonly ConfigService _configuration;
+        private readonly DataContext _dataContext;
+        private readonly SessionService _sessionService;
+
+        public {{ plural }}Controller(
+            ConfigService configuration,
+            DataContext dataContext,
+            SessionService sessionService)
+        {
+            _dataContext = dataContext;
+            _configuration = configuration;
+            _sessionService = sessionService;
+        }
+
+        // GET: {{ plural }}
+        [Authorize()]
+        public async Task<ActionResult> Index(int page = 1)
+        {
+            // Get the sort details.
+            var sortField = _sessionService.GetSortField(Request, "{{ plural }}");
+            var sortDescending = _sessionService.GetSortDescending(Request, "{{ plural }}");
+            var sortColumns = GetColumnList(sortField);
+            ViewBag.SortColumns = sortColumns;
+            ViewBag.SortOrder = new List<SelectListItem>
+            {
+                new SelectListItem { Text = "Sorted", Value = "0", Selected = !sortDescending },
+                new SelectListItem { Text = "Reversed", Value = "1", Selected = sortDescending },
+            };
+
+            // Start defining the data fetching.
+            var data = _dataContext.{{ plural }}.AsNoTracking();
+            if (sortDescending)
+            {
+                {{ #columns }}
+                {{ #if @first }}
+                if (sortField == "") data = data.OrderByDescending(x => x.{{ propertyname }});
+                {{ /if }}
+                if (sortField == "{{ displayname }}") data = data.OrderByDescending(x => x.{{ propertyname }});
+                {{ /columns }}
+            }
+            else
+            {
+                {{ #columns }}
+                {{ #if @first }}
+                if (sortField == "") data = data.OrderBy(x => x.{{ propertyname }});
+                {{ /if }}
+                if (sortField == "{{ displayname }}") data = data.OrderBy(x => x.{{ propertyname }});
+                {{ /columns }}
+            }
+
+            // Set the paging details.
+            var pagerData = new PagerData(
+                _dataContext.{{ plural }}.Count(),
+                sortColumns.Count + 1,
+                _configuration.PageSize,
+                page,
+                _configuration.PageLinksToShow
+            );
+            ViewBag.PagerData = pagerData;
+
+            // Get a single page of data.
+            // If there are no rows it skips this bit as otherwise the
+            // invalid page redirect will always kick in (page count is
+            // 0) so you could never add a new row.
+            if (_dataContext.{{ plural }}.Any())
+            {
+                // Redirect if it isn't a valid page number.
+                if (page != pagerData.PageNumber)
+                {
+                    return RedirectToAction("Index", "{{ plural }}");
+                }
+                data = data.Skip(pagerData.RowOffset).Take(pagerData.PageSize);
+            }
+
+            var result = View(await data.ToListAsync());
+            return result;
+        }
+
+        // GET: {{ plural }}/Sort
+        [Authorize()]
+        [HttpGet]
+        public ActionResult Sort(string field)
+        {
+            // Get the sort details.
+            field = field.Trim();
+            var sortField = _sessionService.GetSortField(Request, "{{ plural }}");
+            var sortDescending = _sessionService.GetSortDescending(Request, "{{ plural }}");
+            var sortColumns = GetColumnList(sortField);
+            var fieldRequested = sortColumns.FirstOrDefault(x => x.Text == field);
+            if (fieldRequested != null && fieldRequested.Value.Any())
+            {
+                // If the same column is clicked, reverse the sort.
+                // Otherwise for a different column default ascnding.
+                var newDirection = (sortField == field ? !sortDescending : false);
+                _sessionService.SetSortField(Response, "{{ plural }}", field);
+                _sessionService.SetSortDescending(Response, "{{ plural }}", newDirection);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST: {{ plural }}/Sort
+        [HttpPost]
+        [Authorize()]
+        [ValidateAntiForgeryToken]
+        public ActionResult Sort([FromForm] int sortColumns, int sortOrder)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    // Ensure the field is a valid one.
+                    var sortField = _sessionService.GetSortField(Request, "{{ plural }}");
+                    var columns = GetColumnList(sortField);
+                    var colStr = sortColumns.ToString();
+                    var field = columns.First(x => x.Value == colStr);
+                    if (field != null)
+                    {
+                        sortField = field.Text;
+                        var sortDescending = sortOrder == 1;
+                        _sessionService.SetSortField(Response, "{{ plural }}", sortField);
+                        _sessionService.SetSortDescending(Response, "{{ plural }}", sortDescending);
+                    }
+
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (Exception ex)
+            {
+                var err = ex.Message;
+                if (ex.InnerException != null) err = ex.InnerException.Message;
+                ModelState.AddModelError("", "There was a problem setting the sort details: " + err);
+            }
+
+            return View();
+        }
+
+        // GET: {{ plural }}/Create
+        [Authorize()]
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: {{ plural }}/Create
+        [HttpPost]
+        [Authorize()]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Create({{ name }} newItem)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    newItem.Id = 0;
+                    _dataContext.Add(newItem);
+                    await _dataContext.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (Exception ex)
+            {
+                var err = ex.Message;
+                if (ex.InnerException != null) err = ex.InnerException.Message;
+                ModelState.AddModelError("", "There was a problem adding the details: " + err);
+            }
+
+            return View(newItem);
+        }
+
+        // GET: {{ plural }}/Edit/5
+        [Authorize()]
+        public async Task<ActionResult> Edit(long? id)
+        {
+            if (id == null) return NotFound();
+            var data = await _dataContext.{{ plural }}
+                .AsNoTracking()
+                .FirstAsync(x => x.Id == id);
+            if (data == null) return NotFound();
+            return View(data);
+        }
+
+        // POST: {{ plural }}/Edit/5
+        [HttpPost]
+        [Authorize()]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Edit(long id, {{ name }} updated)
+        {
+            try
+            {
+                if (id != updated.Id) return NotFound();
+                if (ModelState.IsValid)
+                {
+                    _dataContext.Update(updated);
+                    await _dataContext.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                var err = ex.Message;
+                if (ex.InnerException != null) err = ex.InnerException.Message;
+                ModelState.AddModelError("", "There was a problem updating the details: " + err);
+            }
+
+            return View(updated);
+        }
+
+        // GET: {{ plural }}/Delete/5
+        [Authorize()]
+        public async Task<ActionResult> Delete(long? id)
+        {
+            if (id == null) return NotFound();
+
+            var data = await _dataContext.{{ plural }}
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (data == null) return NotFound();
+            return View(data);
+        }
+
+        // POST: {{ plural }}/Delete/5
+        [HttpPost]
+        [Authorize()]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Delete(long id)
+        {
+            try
+            {
+                var data = await _dataContext.{{ plural }}.FindAsync(id);
+                if (data == null) return NotFound();
+
+                _dataContext.{{ plural }}.Remove(data);
+                await _dataContext.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                var err = ex.Message;
+                if (ex.InnerException != null) err = ex.InnerException.Message;
+                ModelState.AddModelError("", "There was a problem saving the details: " + err);
+            }
+
+            return View();
+        }
+
+        /// <summary>Get a select list of all the columns.</summary>
+        private List<SelectListItem> GetColumnList(string sortField)
+        {
+            return new List<SelectListItem>
+            {
+            {{ #columns }}
+                new SelectListItem { Text = "{{ displayname }}", Value = "{{ @index }}", Selected = "{{ displayname }}" == sortField, },
+            {{ /columns }}
+            };
+        }
+    }
+}

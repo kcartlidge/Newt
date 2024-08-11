@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -7,12 +7,36 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Models" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\Controller.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\Delete.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\Create.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\Edit.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\Layout.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\List.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\ConfigService.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\LogoutView.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\PagerData.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\PagerView.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\Program.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\AppSettings.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\LaunchSettings.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\Stylesheet.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\ViewImports.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\ViewStart.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\SessionService.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\HomeController.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\HomeView.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\LoginView.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\LoginRequestViewModel.hbs" />
+      <EmbeddedResource Include="Writers\ScaffoldedFiles\Templates\UtcDateAnnotation.hbs" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Npgsql" Version="7.0.4" />
+      <PackageReference Include="ArgsParser" Version="5.0.1" />
+      <PackageReference Include="Handlebars.Net" Version="2.1.6" />
+      <PackageReference Include="Npgsql" Version="8.0.3" />
       <PackageReference Include="Pluralize.Net" Version="1.0.2" />
+      <PackageReference Include="System.Text.Json" Version="8.0.4" />
     </ItemGroup>
 
     <ItemGroup>

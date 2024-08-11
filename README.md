@@ -1,7 +1,13 @@
 # NEWT
 
-Autogenerate a .Net (C#/EF Core) data project (class library with entities and data contexts) from a Postgres database.
+Autogenerate a .Net (C#/EF Core) *data project* (class library with entities and data contexts) and an *admin website* from a Postgres database.
 Also creates backup SQL and Graphviz `.dot` diagram source.
+
+If a Solution doesn't exist in the main folder then a new one is created.
+The Data and optional Web project are both added to it.
+*Existing Solution files are not updated.*
+
+*Requires dotnet 6.0.3 or later to be installed.*
 
 - [View the changelog](./CHANGELOG.md)
 
@@ -18,13 +24,16 @@ Add the connection details for your Postgres database to your environment.
 
 - Newt will then ...
     - Scan Postgres
-    - Create a new .Net class library project
+    - Create a new .Net class library *data project*
     - Add the required Nuget packages for EF Core
         - It will also restore them
     - Create EF Core data contexts
         - With automatic .Net class/property naming conventions
         - An InMemory context for testing etc
         - A Postgres context ready for use
+    - Optionally create an ASP.Net MVC Web project
+    - Create a Solution file if one doesn't already exist
+        - Add the Data and optional Web project to it
     - Create entity models (classes) for each table
         - With automatic .Net class/property naming conventions
         - With data annotations for keys, types, lengths etc
@@ -34,9 +43,15 @@ Add the connection details for your Postgres database to your environment.
         - Tables, columns, primary/foreign keys, indexes etc
     - Create the `.dot` source for a *Graphviz* class diagram
         - With classes, properties, and foreign keys
+    - Create an *admin web site*
+        - Gneerate login page
+        - Generate admin pages
+            - Include column sorting and table paging
 - You can then ...
     - Include this in your solution (or generate it in-place)
     - Re-run any time you want an updated data project
+    - Maintain things with the admin website
+    - Or use that as the basis for an actual site
 
 ## Status
 
@@ -60,6 +75,11 @@ There are [pre-built executables](./builds) ready to run for Linux, Mac, and Win
     - [Created Graphviz](#created-graphviz)
 - [Sample Usage](#sample-usage)
 - [Copying a build to somewhere convenient](#copying-a-build-to-somewhere-convenient)
+
+---
+
+For Newt developers only:
+
 - [Generating stand-alone builds](#generating-stand-alone-builds)
     - [For all target systems in one go](#for-all-target-systems-in-one-go)
     - [For a single target system](#for-a-single-target-system)
@@ -69,22 +89,38 @@ There are [pre-built executables](./builds) ready to run for Linux, Mac, and Win
 The command arguments (which are always displayed at runtime) are as follows.
 
 ``` txt
-NEWT (build 2023-08-18)
-Generate a DotNet (C#/EF Core) data access repository project from a Postgres database.
+NEWT (build 2024-08-11)
 
--env       <value>   Environment variable containing the connection string (required)
--folder    <value>   Location to create a nested project inside (required)
--namespace <value>   The top level namespace for the generated C# code (required)
--schema    <value>   The database schema to generate code for (required)
+Generates a DotNet (C#/EF Core) data access repository project from a Postgres database.
+Optionally also creates a matching MVC site for data management.
 
--force               Overwrite any destination content 
+If the parent folder has no solution it will be created and the project(s) added.
+Existing solutions will NOT be updated to include new project(s).
 
-Example:
-  Newt -env DB_CONNSTR -folder "/Source/Core/SampleAPI" -namespace SampleAPI.Data -schema public -force
+The solution name is used if a new solution needs creating.
+Namespaces will also be used as project names/subfolders.
+
+
+USAGE:
+
+  -env  text  * Environment variable containing the connection string  
+  -s    text  * The database schema to generate code for  
+  -f    text  * The parent folder for the solution  
+  -sln  text  * The solution name/namespace  
+  -dn   text  * The C# data project name/namespace  
+  -wn   text    The C# MVC web project name/namespace  
+  -od           Overwrite existing data project
+  -ow           Overwrite existing web project
+  -os           Overwrite existing solution
+
+  * is required
+
+EXAMPLE:
+
+  Newt -env DB_CONNSTR -s public -f ./sample -sln Sample -dn Data -wn Admin
 ```
 
-Note that the destination `-folder` specifies the *parent* of where it should write to.
-This is usually the *Solution* folder; a sub-folder will be created according to the `-namespace`.
+Note that the destination `-f` specifies the *parent* of where it should write to.  This is usually the *Solution* folder; a sub-folder will be created according to the `-sln` name/namespace.
 
 For this to work, you need an environment variable containing a connection string.
 That same environment variable name will be referenced in the generated EF context.
@@ -93,7 +129,8 @@ That same environment variable name will be referenced in the generated EF conte
 export DB_CONNSTR="Server=127.0.0.1;Port=5432;Database=coregen;User Id=coregen;Password=coregen;"
 ```
 
-The above is an example connection string, not a revealed secret.
+*The above is an example connection string, not a revealed secret.*
+
 This environment variable is also used by the auto-generated EF Core data context.
 
 On Windows if you use the `set` command rather than `export` then ensure you don't accidentally include the double quotes (`"`) surrounding the value.  If you do, you'll get a message similar to "*Format of the initialization string does not conform to specification starting at index ...*" - in which case the simple solution is to use the Control Panel to set the Environment Variable value.
@@ -102,10 +139,19 @@ If you don't have a published Newt binary in your path you can run it from sourc
 
 ``` shell
 cd <solution>
-dotnet run --project Newt -- -env DB_CONNSTR -schema public -folder ~/SampleAPI -namespace SampleAPI.Data --force
+dotnet run --project Newt -- -env DB_CONNSTR -s public -f ~/sample -sln Sample -dn Data -wn Admin -od -ow
 ```
 
-Note the extra `--` before `-env` which is *required*.
+Note the extra `--` before `-env` which is *required* for the dotnet CLI to recognise which options it should interpret itself (those to the left) and which it should pass to Newt (those to the right).
+
+If a Solution file doesn't alrady exist at the top level a new one is created.
+
+If you provide a `-wn` parameter then an ASP.Net MVC Web project is also created.
+When a new solution has been requested any created projects are added to it.
+
+Efforts are made to not 'damage' any enclosing solution as it may be your own code.
+
+As a precaution you are *strongly advised* to commit to source control before running to avoid overwriting things you want to keep!
 
 ## Database conventions
 
@@ -145,13 +191,18 @@ You only get a list in the *parent* entity if the *child* one has a foreign key 
 
 ## Output
 
-The following represents generated output assuming a namespace of `SampleAPI.Data`.
+The following represents generated output assuming a namespace of `Sample.Data`.
 The database has an `article`, a `blog`, and a `post` table.
 
 ### Created project files
 
+You will optionally get a Solution and possibly a Web (admin) project.
+They are standard off-the shelf projects.
+
+Here's the Data project's files/folders:
+
 ```
-SampleAPI.Data/
+Sample.Data/
     Entities/
         Article.cs
         Blog.cs
@@ -160,18 +211,22 @@ SampleAPI.Data/
         Postgres.sql
     DataContext.cs
     InMemoryDataContext.cs
-    SampleAPI.Data.csproj
+    Sample.Data.csproj
     schema-dump.json
 ```
+
+Here's an example of the Admin website.
+
+![Admin Website](./admin.png)
 
 ### Created context
 
 ``` cs
 using System;
 using Microsoft.EntityFrameworkCore;
-using SampleAPI.Data.Entities;
+using Sample.Data.Entities;
 
-namespace SampleAPI.Data
+namespace Sample.Data
 {
     public class DataContext : DbContext
     {
@@ -199,7 +254,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SampleAPI.Data.Entities
+namespace Sample.Data.Entities
 {
     /// <summary>
     /// Contains the definition of a single blog site.
@@ -292,7 +347,7 @@ CREATE TABLE IF NOT EXISTS public.blog (
     REFERENCES public.theme (id) MATCH SIMPLE 
     ON UPDATE NO ACTION ON DELETE NO ACTION
 );
-ALTER TABLE public.blog OWNER to sampleapi;
+ALTER TABLE public.blog OWNER to sample;
 COMMENT ON TABLE public.blog IS 'Contains the definition of a single blog site.';
 COMMENT ON COLUMN public.blog.title IS 'For use in browser tabs, tables, lists etc.';
 ```
@@ -319,7 +374,7 @@ When using Github or similar, you may also need to click for the *Raw* file.
 //   dot -o schema.svg -Tsvg schema.dot
 
 digraph {
-  label = "Class diagram for SampleAPI.Data"
+  label = "Class diagram for Sample.Data"
   labelloc = "top"
   fontname = "Verdana"
   fontsize = 16
@@ -353,12 +408,12 @@ digraph {
 ## Sample Usage
 
 Here's how it might be registered in `Program.cs` in .Net 6.
-It assumes the created project is named `SampleApi.Data` and is referenced.
+It assumes the created project is named `Sample.Data` and is referenced.
 
 ``` cs
 // Program.cs
 
-using SampleApi.Data;
+using Sample.Data;
 
 builder.Services.AddScoped<DataContext>();
 ```
@@ -366,16 +421,16 @@ builder.Services.AddScoped<DataContext>();
 *Important note:*
 If you added the connection string environment variable *after* starting your IDE/editor, then you will usually need to restart it.  Any debug/release runs will likely be unable to connect until you do, as the OS only makes available the environment variables that already existed at the time your IDE/editor was launched.
 
-And here's how it might then be used in a controller in a `SampleApi.Api` project.
+And here's how it might then be used in a controller in a `Sample.UI` project.
 
 ``` cs
 // ArticlesController.cs
 
 using Microsoft.AspNetCore.Mvc;
-using SampleApi.Data;
-using SampleApi.Data.Entities;
+using Sample.Data;
+using Sample.Data.Entities;
 
-namespace SampleApi.Api.Controllers;
+namespace Sample.UI.Controllers;
 
 [ApiController]
 [Route("[controller]")]
@@ -411,6 +466,10 @@ sudo cp builds/macos-arm64/Newt /usr/local/bin/Newt
 ```
 
 Alternatively, as builds are pretty small you can include ones for relevant platforms directly into your own project's repository.
+
+---
+
+**What follows if for Newt developers only. You don't need to read this if you are only using Newt as a tool for your own projects.**
 
 ## Generating stand-alone builds
 

@@ -27,10 +27,13 @@ namespace Newt.Models
         /// <summary>The width needed to allow for all column names.</summary>
         public int ColumnNameWidth => Columns.Max(x => x.Name.Length);
 
+        public List<DBColumn> ReadonlyColumns => Columns.Where(x => x.IsPrimaryKey).ToList();
+        public List<DBColumn> EditableColumns => Columns.Where(x => !x.IsPrimaryKey).ToList();
+
         /// <summary>Dot-notated schema and name.</summary>
         private string FullName => $"{Schema}.{Name}";
 
-        public DBTable(string owner, string schema, string name, string comment = null)
+        public DBTable(string owner, string schema, string name, string comment = "")
         {
             _plurals = new Pluralizer();
             Owner = owner;
@@ -42,7 +45,7 @@ namespace Newt.Models
             Indexes = new List<DBIndex>();
             NavigationProperties = new List<DBRelationship>();
         }
-        
+
         public override string ToString()
         {
             return $"{FullName}, columns: {Columns.Count}   {Comment}".Trim();
