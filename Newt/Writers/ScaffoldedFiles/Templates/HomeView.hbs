@@ -17,7 +17,7 @@
     <ul>
     {{ #tables }}
         <li>
-            <a asp-controller="{{ classnameplural }}" asp-action="Index">{{ classnameplural }}</a>
+            <a asp-controller="{{ classnameplural }}" asp-action="Index">{{ displaynameplural }}</a>
             {{ #if comment }}- {{ comment }} {{ /if }}
         </li>
     {{ /tables }}

@@ -5,11 +5,12 @@
     var colCount = ViewBag.SortColumns.Count;
 }
 
-<h1>{{ plural }}</h1>
+<h1>{{ displaynameplural }}</h1>
 <div class="table-comment">{{ comment }} &nbsp;</div>
+<div class="small">Table: <strong>{{ tablename }}</strong></div>
 
 <div class="content">
-    <div><a asp-action="Create" class="link-button">Add {{ name }}</a></div>
+    <div><a asp-action="Create" class="link-button">Add {{ displayname }}</a></div>
 
     <form method="post" asp-action="Sort" class="sort-form">
         @Html.DropDownList("SortColumns")
@@ -55,5 +56,5 @@
         </tbody>
     </table>
 
-    <div><a asp-action="Create" class="link-button">Add {{ name }}</a></div>
+    <div><a asp-action="Create" class="link-button">Add {{ displayname }}</a></div>
 </div>

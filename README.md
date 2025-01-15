@@ -7,7 +7,7 @@ If a Solution doesn't exist in the main folder then a new one is created.
 The Data and optional Web project are both added to it.
 *Existing Solution files are not updated.*
 
-*Requires dotnet 6.0.3 or later to be installed.*
+*Requires dotnet 8 or later to be installed.*
 
 - [View the changelog](./CHANGELOG.md)
 
@@ -89,7 +89,7 @@ For Newt developers only:
 The command arguments (which are always displayed at runtime) are as follows.
 
 ``` txt
-NEWT (build 2024-08-11)
+NEWT (build 2025-01-16)
 
 Generates a DotNet (C#/EF Core) data access repository project from a Postgres database.
 Optionally also creates a matching MVC site for data management.
@@ -473,7 +473,8 @@ Alternatively, as builds are pretty small you can include ones for relevant plat
 
 ## Generating stand-alone builds
 
-The commands below should be run from within the `Newt/Newt` *project* folder, not the solution. Remember to update the build date in the `Program.cs` console output, README output capture, and the CHANGELOG.
+The commands below should be run from within the `Newt/Newt` *project* folder, not the solution.
+Remember to update the build date in the `Program.cs` console output, README output capture (above), and the CHANGELOG.
 There are also details available regarding [copying a build to somewhere convenient](#copying-a-build-to-somewhere-convenient).
 
 *Do not check in new builds automatically every commit*; only do so when a genuine version and release change occurs.

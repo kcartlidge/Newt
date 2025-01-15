@@ -1,5 +1,15 @@
 # CHANGE LOG
 
+- 2025-01-16
+    - Upgrade to .Net 8
+    - Remove JSON schema dump
+        - Needs code changes for .Net 8 as builds are trimmed
+        - May revisit in the future
+    - Stopped trimming the builds
+        - Trimmed builds were failing to include namespaces in generated code
+        - Untrimmed builds are around 5x larger but they work
+        - May revisit in the future
+    - Small Admin UI tweaks
 - 2024-08-11
     - Generate ASP.Net MVC admin site project
     - Generate new Solution file if one doesn't already exist

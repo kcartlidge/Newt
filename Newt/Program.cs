@@ -12,7 +12,9 @@ namespace Newt
         {
             // Welcome text.
             Console.WriteLine();
-            Console.WriteLine("NEWT (build 2024-08-11)");
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine("NEWT (build 2025-01-16)");
             Console.WriteLine();
             Console.WriteLine("Generates a DotNet (C#/EF Core) data access repository project from a Postgres database.");
             Console.WriteLine("Optionally also creates a matching MVC site for data management.");
@@ -135,7 +137,6 @@ namespace Newt
                 SolutionExtras.Write(config);
 
                 // Create the data project.
-                JSON.Write(config);
                 Graphviz.Write(config);
                 DataProject.Write(config);
                 SqlScripts.Write(config);

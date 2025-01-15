@@ -2,7 +2,8 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
+        <RollForward>LatestMajor</RollForward>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
@@ -32,11 +33,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="ArgsParser" Version="5.0.1" />
+      <PackageReference Include="ArgsParser" Version="6.0.0" />
       <PackageReference Include="Handlebars.Net" Version="2.1.6" />
-      <PackageReference Include="Npgsql" Version="8.0.3" />
+      <PackageReference Include="Npgsql" Version="9.0.2" />
       <PackageReference Include="Pluralize.Net" Version="1.0.2" />
-      <PackageReference Include="System.Text.Json" Version="8.0.4" />
     </ItemGroup>
 
     <ItemGroup>

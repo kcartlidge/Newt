@@ -11,8 +11,7 @@ namespace Newt.Writers
         /// <summary>Writes the Graphviz `.dot` file for the schema.</summary>
         public static void Write(Config config)
         {
-            Console.WriteLine();
-            Console.WriteLine("GRAPHVIZ");
+            Support.ShowHeading("GRAPHVIZ");
             Support.EnsureFullPathExists(config.DataProjectFolder);
 
             var filename = Path.Combine(config.DataProjectFolder, "schema.dot");
@@ -109,7 +108,7 @@ namespace Newt.Writers
 
             src.AppendLine("}");
 
-            Support.WriteFileWithChecks(filename, config.OverwriteData, src.ToString());
+            Support.WriteFileWithChecks(config.SolutionFolder, filename, config.OverwriteData, src.ToString());
         }
     }
 }

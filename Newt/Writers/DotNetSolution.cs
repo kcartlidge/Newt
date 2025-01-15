@@ -10,8 +10,7 @@ namespace Newt.Writers
         /// </summary>
         public static void Write(Config config)
         {
-            Console.WriteLine();
-            Console.WriteLine("DOTNET SOLUTION");
+            Support.ShowHeading("DOTNET SOLUTION");
 
             // Skip if there's already any solution file(s).
             if (config.CreateSolution == false)
