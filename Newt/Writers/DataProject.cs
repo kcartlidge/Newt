@@ -10,8 +10,7 @@ namespace Newt.Writers
         /// </summary>
         public static void Write(Config config)
         {
-            Console.WriteLine();
-            Console.WriteLine("DATA PROJECT");
+            Support.ShowHeading("DATA PROJECT");
 
             Console.WriteLine("Creating project");
             Support.RunCommand("dotnet", $"new classlib -n {config.DataNamespace}", config.SolutionFolder);

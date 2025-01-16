@@ -13,22 +13,21 @@
 <body>
     <header>
         <h1><strong>Newt</strong> Administration</h1>
-        <nav>
-            <a asp-controller="Home" asp-action="Index">Home</a>
-@if (loggedIn)
-{
-            <a asp-controller="Home" asp-action="Logout" class="danger">Sign Out</a>
-            <span>|</span>
-            {{ #tables }}
-            <a asp-controller="{{ classnameplural }}" asp-action="Index">{{ classnameplural }}</a>
-            {{ /tables }}
-}
-else
-{
-            <a asp-controller="Home" asp-action="Login">Sign In</a>
-}
-        </nav>
+        <a asp-controller="Home" asp-action="Index">Home</a>
+    @if (loggedIn)
+    {
+        <a asp-controller="Home" asp-action="Logout" class="danger">Sign Out</a>
+    }
+    else
+    {
+        <a asp-controller="Home" asp-action="Login">Sign In</a>
+    }
     </header>
+    <nav>
+        {{ #tables }}
+        <a class="nav-button" asp-controller="{{ classnameplural }}" asp-action="Index">{{ displaynameplural }}</a>
+        {{ /tables }}
+    </nav>
     <main>
         @RenderBody()
     </main>

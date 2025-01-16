@@ -39,13 +39,9 @@ h6 {
     line-height: 1.2em;
 }
 
-main, footer {
+header, nav, main, footer {
+    font-size: 1rem;
     padding: 0.5rem 2rem;
-}
-
-header {
-    padding: 0;
-    width: 100%;
 }
 
 a,
@@ -60,41 +56,40 @@ a:hover {
     margin: 0 0.5rem 0.1rem 0;
 }
 
-    a:hover {
-        border-bottom-color: #2948c1;
-        color: #2948c1;
-    }
-
-nav {
-    display: inline-block;
-    margin: 0 0 1rem 1.6rem;
-    font-size: 0.9rem;
-    padding: 0 0.2rem;
+a:hover {
+    border-bottom-color: #2948c1;
+    color: #2948c1;
 }
 
-    nav a,
-    nav a:link,
-    nav a:active,
-    nav a:visited,
-    nav a:hover {
-        border: solid 2px #000;
-        color: #000;
-        display: inline-block;
-        margin: 0.2rem 0.1rem;
-        padding: 0.25rem 0.5rem;
-    }
+nav a, nav a:link, nav a:active, nav a:visited, nav a:hover {
+    border: 0;
+    font-size: 1.1rem;
+}
 
-        nav a:hover {
-            background: #000 !important;
-            border-color: #000 !important;
-            color: #fff !important;
-        }
+nav a.nav-button,
+nav a.nav-button:link,
+nav a.nav-button:active,
+nav a.nav-button:visited,
+nav a.nav-button:hover {
+    border: solid 2px #000;
+    color: #000;
+    display: inline-block;
+    margin: 0.2rem 0.1rem;
+    padding: 0.25rem 0.5rem;
+}
 
-        nav a.danger {
-            background: #f7f5f5;;
-            color: #a95a5a;
-            border-color: #a95a5a;
-        }
+nav a.nav-button:hover {
+    background: #000 !important;
+    border-color: #000 !important;
+    color: #fff !important;
+}
+
+nav hr {
+    border: 0;
+    height: 2px;
+    background: #000;
+    background: linear-gradient(to right, #555, transparent 80%);
+}
 
 h1 {
     font-size: 1.75rem;
@@ -113,7 +108,6 @@ h3 {
 header h1 {
     font-weight: normal;
     font-size: 1.3rem;
-    padding: 0.25rem 2rem 0 2rem;
     margin: 0;
 }
 
@@ -139,9 +133,9 @@ li {
     margin: 0.5rem 0 0.5rem 1rem;
 }
 
-    li a, li a:link, li a:visited, li a:active, li a:hover {
-        border: 0;
-    }
+li a, li a:link, li a:visited, li a:active, li a:hover {
+    border: 0;
+}
 
 table {
     vertical-align: middle;
@@ -197,9 +191,9 @@ input[type=submit], button, a.link-button {
     opacity: 0.8;
 }
 
-    input[type=submit]:hover, button:hover, a.link-button:hover {
-        opacity: 1;
-    }
+input[type=submit]:hover, button:hover, a.link-button:hover {
+    opacity: 1;
+}
 
 th a {
     display: block;
@@ -221,11 +215,6 @@ td a {
     color: #a95a5a;
 }
 
-    nav a.danger:hover {
-        background-color: #a95a5a !important;
-        border-color: #a95a5a !important;
-    }
-
 .success {
     color: #477f52;
 }
@@ -246,10 +235,10 @@ form {
     vertical-align: baseline;
 }
 
-    form.sort-form {
-        white-space: nowrap;
-        margin: 1rem 0 0 0;
-    }
+form.sort-form {
+    white-space: nowrap;
+    margin: 1rem 0 0 0;
+}
 
 fieldset {
     border: 0;
@@ -282,22 +271,22 @@ input[type=text], textarea {
     background: #fff;
 }
 
-    input[type=text].input-narrow {
-        width: 8rem;
-    }
+input[type=text].input-narrow {
+    width: 8rem;
+}
 
-    input[type=text].readonly {
-        background: #ddd;
-        border-color: #ddd;
-    }
+input[type=text].readonly {
+    background: #ddd;
+    border-color: #ddd;
+}
 
-    input[type=text].input-medium {
-        width: 15rem;
-    }
+input[type=text].input-medium {
+    width: 15rem;
+}
 
-    input[type=text].input-wide, input[type=password], textarea {
-        width: 40rem;
-    }
+input[type=text].input-wide, input[type=password], textarea {
+    width: 40rem;
+}
 
 input[type=submit].danger, a.link-button.danger {
     background: #a95a5a !important;
@@ -314,15 +303,15 @@ input[type=submit].success, a.link-button.success {
     color: #a95a5a;
 }
 
-    .validation-summary-errors ul, .validation-summary-errors li {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
+.validation-summary-errors ul, .validation-summary-errors li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
 
-    .validation-summary-errors ul {
-        margin-top: 1rem;
-    }
+.validation-summary-errors ul {
+    margin-top: 1rem;
+}
 
 .input-validation-error {
     border-color: #a95a5a;
@@ -354,14 +343,18 @@ td.pager {
     background: #d6d6d6;
 }
 
-    td.pager span {
-        display: inline-block;
-        padding-right: 2rem;
-    }
+td.pager span {
+    display: inline-block;
+    padding-right: 2rem;
+}
 
-        td.pager span a {
-            display: inline-block;
-            margin: 0;
-            padding: 0 0.25rem;
-            letter-spacing: -1px;
-        }
+td.pager span a {
+    display: inline-block;
+    margin: 0;
+    padding: 0 0.25rem;
+    letter-spacing: -1px;
+}
+
+.small {
+    font-size: 0.8rem;
+}

@@ -10,14 +10,12 @@ namespace Newt.Writers
         /// <summary>Write the contexts for both InMemory and Postgres.</summary>
         public static void Write(Config config)
         {
-            Console.WriteLine();
-            Console.WriteLine("EF CORE CONTEXTS");
+            Support.ShowHeading("EF CORE CONTEXTS");
             Support.EnsureFullPathExists(config.DataProjectFolder);
 
             var filename = Path.Combine(config.DataProjectFolder, "UtcDateAnnotation.cs");
-            var utcFixSource = ScaffoldedFiles.Scaffold.GetSource(config, "UtcDateAnnotation",
-                    config.DataNamespace, config.WebNamespace, null);
-            Support.WriteFileWithChecks(filename, config.OverwriteData, utcFixSource);
+            var utcFixSource = ScaffoldedFiles.Scaffold.GetSource(config, "UtcDateAnnotation", null);
+            Support.WriteFileWithChecks(config.SolutionFolder, filename, config.OverwriteData, utcFixSource);
 
             foreach (var contextType in new[] { "Data", "InMemoryData" })
             {
@@ -67,7 +65,7 @@ namespace Newt.Writers
                 if (contextType == "Data")
                     src.AppendLine($"#pragma warning restore CS8604 // Possible null reference argument.");
 
-                Support.WriteFileWithChecks(filename, config.OverwriteData, src.ToString());
+                Support.WriteFileWithChecks(config.SolutionFolder, filename, config.OverwriteData, src.ToString());
             }
         }
     }

@@ -14,8 +14,7 @@ namespace Newt.Writers
         {
             if (config.IncludeWebProject == false) return;
 
-            Console.WriteLine();
-            Console.WriteLine("WEB PROJECT");
+            Support.ShowHeading("WEB PROJECT");
 
             Console.WriteLine("Creating project");
             Support.RunCommand("dotnet", $"new web -n {config.WebNamespace} --kestrelHttpPort 3000 --kestrelHttpsPort 3001 --use-program-main", config.SolutionFolder);
@@ -76,8 +75,7 @@ namespace Newt.Writers
             Models.DBTable? table,
             params string[] pathSegments)
         {
-            var src = ScaffoldedFiles.Scaffold.GetSource(config, template,
-                    config.DataNamespace, config.WebNamespace, table);
+            var src = ScaffoldedFiles.Scaffold.GetSource(config, template, table);
 
             var route = pathSegments.ToList();
             route.Insert(0, config.WebProjectFolder);
@@ -85,7 +83,7 @@ namespace Newt.Writers
             var folder = Path.GetDirectoryName(filename);
 
             Directory.CreateDirectory(folder!);
-            Support.WriteFileWithChecks(filename, true, src);
+            Support.WriteFileWithChecks(config.SolutionFolder, filename, true, src);
         }
     }
 }

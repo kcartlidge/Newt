@@ -10,8 +10,7 @@ namespace Newt.Writers
         /// </summary>
         public static void Write(Config config)
         {
-            Console.WriteLine();
-            Console.WriteLine("ADD PROJECT(S) TO SOLUTION");
+            Support.ShowHeading("ADD PROJECT(S) TO SOLUTION");
 
             if (config.IncludeWebProject)
             {

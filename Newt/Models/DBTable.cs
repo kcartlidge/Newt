@@ -21,6 +21,12 @@ namespace Newt.Models
         /// <summary>The ProperCase name of the mapped class.</summary>
         public string ClassName => Name.SnakeToProper();
 
+        /// <summary>The Proper Case display name of the mapped class.</summary>
+        public string DisplayName => Name.SnakeToProper(true);
+
+        /// <summary>The Proper Case display name of the mapped class, pluralised.</summary>
+        public string DisplayNamePlural => _plurals.Pluralize(Name.SnakeToProper(true));
+
         /// <summary>The ProperCase name of the mapped property, pluralised.</summary>
         public string ClassNamePlural => _plurals.Pluralize(ClassName);
 

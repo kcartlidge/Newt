@@ -49,17 +49,30 @@ namespace Newt
             Directory.CreateDirectory(baseFolder);
         }
 
+        /// <summary>Shows the formatted heading on the console.</summary>
+        /// <param name="heading">The heading to show.</param>
+        public static void ShowHeading(string heading)
+        {
+            var width = Math.Max(heading.Length, 30);
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine(heading);
+            Console.WriteLine("".PadLeft(width, '-'));
+        }
+
         /// <summary>
         /// Writes the content to the file. If the file exists,
         /// and the option to 'force' was not provided at construction,
         /// an exception is raised.
         /// </summary>
         public static void WriteFileWithChecks(
+            string baseFolder,
             string filename,
             bool force,
             string content)
         {
-            Console.WriteLine(filename);
+            var displayPath = Path.GetRelativePath(baseFolder, filename);
+            Console.WriteLine($"  {displayPath}");
             if (force == false && File.Exists(filename))
                 throw new Exception($"File exists: {filename}");
             File.WriteAllText(filename, content, Encoding.UTF8);
@@ -175,4 +188,3 @@ namespace Newt
         }
     }
 }
-

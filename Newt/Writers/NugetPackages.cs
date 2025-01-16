@@ -10,8 +10,7 @@ namespace Newt.Writers
         /// </summary>
         public static void Write(Config config)
         {
-            Console.WriteLine();
-            Console.WriteLine("NUGET PACKAGES");
+            Support.ShowHeading("NUGET PACKAGES");
 
             Console.WriteLine($"Adding nuget references to data project");
             Support.RunCommand("dotnet", $"add package Npgsql", config.DataProjectFolder);

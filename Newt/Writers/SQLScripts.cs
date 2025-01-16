@@ -12,8 +12,7 @@ namespace Newt.Writers
         /// <summary>Write the emergency-use SQL scripts for the schema.</summary>
         public static void Write(Config config)
         {
-            Console.WriteLine();
-            Console.WriteLine("SQL SCRIPT");
+            Support.ShowHeading("SQL SCRIPT");
             Support.EnsureFullPathExists(config.DataProjectFolder, "SQL");
 
             var filename = Path.Join(config.DataProjectFolder, "SQL", "Postgres.sql");
@@ -36,7 +35,7 @@ namespace Newt.Writers
                 GetPostgresScriptForTable(table, src, config.DataNamespace, true);
             }
 
-            Support.WriteFileWithChecks(filename, config.OverwriteData, src.ToString());
+            Support.WriteFileWithChecks(config.SolutionFolder, filename, config.OverwriteData, src.ToString());
         }
 
         private static void GetPostgresScriptForTable(DBTable table, StringBuilder src, string dbNamespace, bool includeDrop)

@@ -11,8 +11,7 @@ namespace Newt.Writers
         /// <summary>Write all the .Net EF Core entity models.</summary>
         public static void Write(Config config)
         {
-            Console.WriteLine();
-            Console.WriteLine("ENTITIES");
+            Support.ShowHeading("ENTITIES");
             Support.EnsureFullPathExists(config.DataProjectFolder, "Entities");
 
             foreach (var table in config.Schema.Tables)
@@ -64,7 +63,7 @@ namespace Newt.Writers
                 src.AppendLine($"");
                 src.AppendLine($"#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.");
 
-                Support.WriteFileWithChecks(filename, config.OverwriteData, src.ToString());
+                Support.WriteFileWithChecks(config.SolutionFolder, filename, config.OverwriteData, src.ToString());
             }
         }
     }
